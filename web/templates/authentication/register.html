@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Buy2Express</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+
+        :root {
+            --primary: #ff4747;
+            --gradient: linear-gradient(135deg, #ff4747, #ff7676);
+            --shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(45deg, #f3f4f6, #fff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 440px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: fadeUp 0.6s ease;
+        }
+
+        .card-header {
+            background: var(--gradient);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .logo i { animation: spin 3s linear infinite; }
+
+        .card-header p { opacity: 0.9; font-size: 15px; }
+
+        .card-body { padding: 35px 30px; }
+
+        /* Error / success messages */
+        .messages { margin-bottom: 20px; }
+        .msg {
+            padding: 11px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .msg.error   { background: #fff0f0; color: #d63031; border-left: 3px solid #d63031; }
+        .msg.success { background: #f0fff4; color: #00b894; border-left: 3px solid #00b894; }
+
+        /* Form fields */
+        .field { margin-bottom: 20px; }
+        .field label { display: block; font-size: 13px; color: #555; margin-bottom: 7px; font-weight: 500; }
+
+        .input-wrap { position: relative; }
+        .input-wrap input {
+            width: 100%;
+            padding: 13px 45px 13px 16px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: border-color 0.25s, box-shadow 0.25s;
+            outline: none;
+        }
+        .input-wrap input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255,71,71,0.1);
+        }
+        .input-wrap input.is-invalid { border-color: #d63031; }
+
+        .input-wrap .icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 15px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .input-wrap input:focus ~ .icon { color: var(--primary); }
+
+        .field-error { font-size: 12px; color: #d63031; margin-top: 5px; display: none; }
+        .field-error.show { display: block; }
+
+        /* Submit button */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 5px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,71,71,0.4); }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 22px 0;
+            position: relative;
+            color: #bbb;
+            font-size: 13px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 43%;
+            height: 1px;
+            background: #eee;
+        }
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        /* Social */
+        .social { display: flex; gap: 12px; justify-content: center; margin-bottom: 22px; }
+        .social-btn {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            border: 2px solid #eee;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #888;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .social-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,0,0,0.1); }
+        .social-btn.google:hover   { color: #DB4437; border-color: #DB4437; }
+        .social-btn.facebook:hover { color: #4267B2; border-color: #4267B2; }
+        .social-btn.twitter:hover  { color: #1DA1F2; border-color: #1DA1F2; }
+
+        .footer-link { text-align: center; font-size: 14px; color: #777; }
+        .footer-link a { color: var(--primary); font-weight: 600; text-decoration: none; margin-left: 4px; }
+        .footer-link a:hover { text-decoration: underline; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-header">
+        <div class="logo">
+            <i class="fas fa-shopping-bag"></i>
+            Buy2Express
+        </div>
+        <p>Create your account and start shopping</p>
+    </div>
+
+    <div class="card-body">
+
+        <!-- Django messages (server-side errors) -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="msg {{ message.tags }}">
+                <i class="fas fa-exclamation-circle"></i> {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Form errors from Django -->
+        {% if form.errors %}
+        <div class="messages">
+            {% for field in form %}
+                {% for error in field.errors %}
+                <div class="msg error">
+                    <i class="fas fa-exclamation-circle"></i> {{ field.label }}: {{ error }}
+                </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+            <div class="msg error">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" id="signupForm" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="field">
+                <label for="username">Username</label>
+                <div class="input-wrap">
+                    <input type="text" id="username" name="username"
+                           value="{{ form.username.value|default:'' }}"
+                           placeholder="Choose a username" required>
+                    <i class="fas fa-user icon"></i>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="email">Email Address</label>
+                <div class="input-wrap">
+                    <input type="email" id="email" name="email"
+                           value="{{ form.email.value|default:'' }}"
+                           placeholder="Enter your email" required>
+                    <i class="fas fa-envelope icon"></i>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="password" name="password"
+                           placeholder="Min 8 characters" required>
+                    <i class="fas fa-lock icon" id="togglePwd1"></i>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="confirm_password">Confirm Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="confirm_password" name="confirm_password"
+                           placeholder="Repeat your password" required>
+                    <i class="fas fa-lock icon" id="togglePwd2"></i>
+                </div>
+                <div class="field-error" id="pwdError">Passwords do not match!</div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                Create Account
+            </button>
+        </form>
+
+        <div class="divider">OR</div>
+
+        <div class="social">
+            <div class="social-btn google"><i class="fab fa-google"></i></div>
+            <div class="social-btn facebook"><i class="fab fa-facebook-f"></i></div>
+            <div class="social-btn twitter"><i class="fab fa-twitter"></i></div>
+        </div>
+
+        <div class="footer-link">
+            Already have an account? <a href="{% url 'authentication:login' %}">Login</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Password visibility toggles
+    document.getElementById('togglePwd1').addEventListener('click', function () {
+        const input = document.getElementById('password');
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        this.className = show ? 'fas fa-lock-open icon' : 'fas fa-lock icon';
+    });
+
+    document.getElementById('togglePwd2').addEventListener('click', function () {
+        const input = document.getElementById('confirm_password');
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        this.className = show ? 'fas fa-lock-open icon' : 'fas fa-lock icon';
+    });
+
+    // Live password match check
+    document.getElementById('confirm_password').addEventListener('input', function () {
+        const pwd = document.getElementById('password').value;
+        const err = document.getElementById('pwdError');
+        if (this.value && this.value !== pwd) {
+            err.classList.add('show');
+            this.classList.add('is-invalid');
+        } else {
+            err.classList.remove('show');
+            this.classList.remove('is-invalid');
+        }
+    });
+
+    // Form submit validation
+    document.getElementById('signupForm').addEventListener('submit', function (e) {
+        const pwd = document.getElementById('password').value;
+        const cpwd = document.getElementById('confirm_password').value;
+        const err = document.getElementById('pwdError');
+
+        if (pwd !== cpwd) {
+            e.preventDefault();
+            err.classList.add('show');
+            document.getElementById('confirm_password').classList.add('is-invalid');
+            return;
+        }
+
+        // All good — show loading
+        const btn = document.getElementById('submitBtn');
+        btn.textContent = 'Creating account...';
+        btn.disabled = true;
+    });
+</script>
+</body>
+</html>

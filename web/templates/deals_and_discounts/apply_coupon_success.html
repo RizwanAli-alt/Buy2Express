@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Coupon Applied | Buy2Express{% endblock %}
+{% block content %}
+<style>
+    .shell { max-width: 760px; margin: 0 auto; padding: 32px 20px 0; }
+    .panel { background:white; border-radius:20px; box-shadow:0 10px 28px rgba(0,0,0,0.08); overflow:hidden; }
+    .header { background: linear-gradient(135deg, #ff4747, #ff7676); color:white; padding: 28px 32px; }
+    .body { padding: 32px; }
+</style>
+<div class="shell">
+    <div class="panel">
+        <div class="header"><h1>Coupon Applied</h1></div>
+        <div class="body">
+            <p>Coupon <strong>{{ coupon.code }}</strong> is valid and has been applied.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

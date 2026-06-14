@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Products | Buy2Express{% endblock %}
+{% block content %}
+<style>
+    .product-shell {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 32px 20px 0;
+    }
+    .hero {
+        background: linear-gradient(135deg, #ff4747, #ff7676);
+        color: white;
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 16px 40px rgba(255, 71, 71, 0.18);
+        margin-bottom: 24px;
+    }
+    .hero h1 { font-size: 38px; margin-bottom: 10px; }
+    .hero p { max-width: 720px; opacity: 0.95; }
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin: 24px 0;
+        flex-wrap: wrap;
+    }
+    .toolbar a,
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 12px;
+        padding: 12px 16px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; }
+    .btn-soft { background: #fff; color: #222; border: 1px solid #ececec; }
+    .filters {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 26px;
+    }
+    .filters input,
+    .filters select {
+        width: 100%;
+        padding: 13px 14px;
+        border: 1px solid #e8e8e8;
+        border-radius: 12px;
+        background: white;
+    }
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 22px;
+    }
+    .card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(0,0,0,0.12); }
+    .card-image {
+        height: 180px;
+        background: linear-gradient(135deg, #f3f4f6, #ffffff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #aaa;
+        font-size: 48px;
+    }
+    .card-body { padding: 20px; }
+    .meta { color: #777; font-size: 13px; margin-bottom: 10px; }
+    .price { color: #ff4747; font-size: 20px; font-weight: 700; margin-top: 10px; }
+    .discount { color: #777; text-decoration: line-through; font-size: 14px; margin-left: 8px; }
+    .actions { display: flex; gap: 10px; margin-top: 16px; }
+    .actions a { flex: 1; justify-content: center; }
+    .empty {
+        background: white;
+        border-radius: 20px;
+        padding: 48px;
+        text-align: center;
+        color: #666;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+    .pagination { margin: 28px 0 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .pagination a, .pagination span { padding: 10px 14px; border-radius: 10px; text-decoration: none; }
+    .pagination .current { background: #ff4747; color: white; }
+    @media (max-width: 900px) { .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .hero h1 { font-size: 30px; } .filters { grid-template-columns: 1fr; } }
+</style>
+<div class="product-shell">
+    <section class="hero">
+        <h1>Products</h1>
+        <p>Browse the catalog, manage inventory, and keep the storefront consistent with the Buy2Express theme.</p>
+    </section>
+
+    <div class="toolbar">
+        <div>
+            <a class="btn btn-soft" href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Home</a>
+        </div>
+        <div>
+            <a class="btn btn-primary" href="{% url 'product_management:product_create' %}"><i class="fas fa-plus"></i> Add Product</a>
+        </div>
+    </div>
+
+    <form class="filters" method="get">
+        <input type="text" name="q" placeholder="Search products" value="{{ query|default:'' }}">
+        <select name="category">
+            <option value="">All categories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if category_filter|stringformat:'s' == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="brand">
+            <option value="">All brands</option>
+            {% for brand in brands %}
+                <option value="{{ brand.id }}" {% if brand_filter|stringformat:'s' == brand.id|stringformat:'s' %}selected{% endif %}>{{ brand.name }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+
+    {% if page_obj.object_list %}
+    <div class="product-grid">
+        {% for product in page_obj.object_list %}
+        <article class="card">
+            <div class="card-image">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <div class="card-body">
+                <div class="meta">{{ product.category.name }}{% if product.brand %} · {{ product.brand.name }}{% endif %}</div>
+                <h3>{{ product.name }}</h3>
+                <p class="meta">{{ product.description|truncatechars:90 }}</p>
+                <div class="price">${{ product.price }}{% if product.discount_price %}<span class="discount">${{ product.discount_price }}</span>{% endif %}</div>
+                <div class="actions">
+                    <a class="btn btn-soft" href="{% url 'product_management:product_update' product.pk %}">Edit</a>
+                    <a class="btn btn-soft" href="{% url 'product_management:product_delete' product.pk %}">Delete</a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a class="btn btn-soft" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}">Previous</a>
+        {% endif %}
+        <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a class="btn btn-soft" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}">Next</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="empty">
+        <h2>No products found</h2>
+        <p>Create the first product to populate the catalog.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

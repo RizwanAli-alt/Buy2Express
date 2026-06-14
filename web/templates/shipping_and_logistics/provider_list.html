@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Shipping Providers | Buy2Express{% endblock %}
+{% block content %}
+<style>
+    .shell { max-width: 1100px; margin: 0 auto; padding: 32px 20px 0; }
+    .hero { background: linear-gradient(135deg, #ff4747, #ff7676); color:white; border-radius:24px; padding:32px; margin-bottom:24px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+    .card { background:white; border-radius:18px; padding:22px; box-shadow:0 10px 28px rgba(0,0,0,0.08); }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:12px; padding:12px 16px; text-decoration:none; font-weight:700; border:none; cursor:pointer; }
+    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color:white; }
+</style>
+<div class="shell">
+    <div class="hero">
+        <h1>Shipping Providers</h1>
+        <p>Track the delivery partners used by the store.</p>
+    </div>
+    <p><a class="btn btn-primary" href="{% url 'shipping_and_logistics:add_shipping_provider' %}">Add Provider</a></p>
+    <div class="grid" style="margin-top:18px;">
+        {% for provider in providers %}
+        <div class="card">
+            <h3>{{ provider.name }}</h3>
+            <p>{{ provider.contact_number|default:'No contact number' }}</p>
+            <p>{{ provider.website|default:'No website' }}</p>
+        </div>
+        {% empty %}
+        <div class="card">No providers found.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

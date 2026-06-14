@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | Buy2Express</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f3f4f6, #ffffff);
+            padding: 24px;
+        }
+        .wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .header {
+            padding: 28px 32px;
+            background: linear-gradient(135deg, #ff4747, #ff7676);
+            color: #fff;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; }
+        .body { padding: 32px; }
+        .messages { margin-bottom: 20px; }
+        .msg {
+            padding: 11px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .msg.error { background: #fff0f0; color: #d63031; }
+        .msg.success { background: #f0fff4; color: #00b894; }
+        .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        .field.full { grid-column: 1 / -1; }
+        label { font-size: 13px; color: #555; font-weight: 600; }
+        input, textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 2px solid #ececec;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+        }
+        input:focus, textarea:focus { border-color: #ff4747; box-shadow: 0 0 0 4px rgba(255,71,71,0.08); }
+        .actions { margin-top: 22px; display: flex; gap: 12px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 18px;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn.primary { background: linear-gradient(135deg, #ff4747, #ff7676); color: #fff; }
+        .btn.secondary { background: #f3f4f6; color: #222; }
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+            .body, .header { padding-left: 20px; padding-right: 20px; }
+            .grid { grid-template-columns: 1fr; }
+            .actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <h1>My Profile</h1>
+            <p>Update your account and shipping details.</p>
+        </div>
+        <div class="body">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="msg {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="grid">
+                    <div class="field">
+                        <label for="id_profile_image">Profile image</label>
+                        {{ form.profile_image }}
+                    </div>
+                    <div class="field">
+                        <label for="id_contact_number">Contact number</label>
+                        {{ form.contact_number }}
+                    </div>
+                    <div class="field full">
+                        <label for="id_shipping_address">Shipping address</label>
+                        {{ form.shipping_address }}
+                    </div>
+                    <div class="field full">
+                        <label for="id_billing_address">Billing address</label>
+                        {{ form.billing_address }}
+                    </div>
+                    <div class="field">
+                        <label for="id_date_of_birth">Date of birth</label>
+                        {{ form.date_of_birth }}
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn primary" type="submit"><i class="fas fa-save"></i> Save changes</button>
+                    <a class="btn secondary" href="{% url 'home' %}">Back to home</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
