@@ -6,7 +6,7 @@ class Cart(models.Model):
 
     def get_total_price(self):
         return sum(item.product.price * item.quantity for item in self.items.all())
-    
+
     def clear(self):
         self.items.all().delete()
 
@@ -16,6 +16,12 @@ class CartItem(models.Model):
     variant = models.ForeignKey('product_management.ProductVariant', on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['cart']),      # ✅ fetch all items in a cart
+            models.Index(fields=['product']),   # ✅ find carts containing a product
+        ]
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -23,7 +29,6 @@ class Order(models.Model):
         ('Shipped', 'Shipped'),
         ('Delivered', 'Delivered'),
     ]
-
     user = models.ForeignKey('authentication.CustomUser', on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=15, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
@@ -32,9 +37,23 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['user']),              # ✅ user's order history
+            models.Index(fields=['status']),            # ✅ filter by status
+            models.Index(fields=['user', 'status']),    # ✅ composite: my pending orders
+            models.Index(fields=['-created_at']),       # ✅ latest orders first
+        ]
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey('product_management.Product', on_delete=models.CASCADE)
     variant = models.ForeignKey('product_management.ProductVariant', on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['order']),    # ✅ fetch all items in an order
+            models.Index(fields=['product']),  # ✅ sales analytics per product
+        ]
