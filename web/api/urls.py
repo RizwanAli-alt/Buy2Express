@@ -82,4 +82,6 @@ urlpatterns = [
 
     # ── ViewSet router ────────────────────────────────────────────────────────
     path('', include(router.urls)),
+
+    path('search/autocomplete/', search_views.AutocompleteView.as_view(), name='autocomplete'),
 ]

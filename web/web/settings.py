@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_elasticsearch_dsl',
     # Third-party
     "rest_framework",
     "rest_framework_simplejwt",
@@ -157,3 +158,16 @@ if not DEBUG:
 
 # ── Email ─────────────────────────────────────────────────────────────────────
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+
+# ── Elasticsearch ─────────────────────────────────────────────────────────────
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': os.environ.get('ELASTICSEARCH_HOST', 'http://localhost:9200'),
+    },
+}
+
+ELASTICSEARCH_INDEX_NAMES = {
+    'search_and_recommendations.documents': 'products',
+}
