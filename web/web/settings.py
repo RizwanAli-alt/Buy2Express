@@ -113,3 +113,16 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+
+
+
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]  # your static folder is inside web/
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

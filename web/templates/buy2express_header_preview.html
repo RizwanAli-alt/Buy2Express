@@ -1,0 +1,293 @@
+
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+  :root{
+    --primary:#ff4444;--primary-dark:#e03030;--primary-glow:rgba(255,68,68,0.18);
+    --header-bg:#0a0a0a;--nav-bg:#111;
+    --text-white:#fff;--text-muted:#aaa;
+    --card-bg:#fff;--border:#eee;
+    --shadow-sm:0 2px 8px rgba(0,0,0,0.08);--shadow-md:0 6px 24px rgba(0,0,0,0.12);
+    --radius:10px;--transition:all 0.25s ease;
+  }
+  body{background:#f5f5f5}
+  /* HEADER */
+  .header{background:var(--header-bg);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.5)}
+  .top-bar{display:flex;align-items:center;gap:20px;padding:14px 24px;max-width:1400px;margin:0 auto}
+  .logo{color:#fff;font-size:24px;font-weight:800;letter-spacing:-0.5px;text-decoration:none;white-space:nowrap;transition:var(--transition)}
+  .logo span{color:var(--primary)}
+  .logo:hover{opacity:0.85}
+  .search-wrap{flex:1;position:relative;max-width:620px}
+  .search-wrap input{
+    width:100%;padding:11px 50px 11px 18px;border-radius:28px;border:2px solid transparent;
+    font-size:14px;background:#1e1e1e;color:#fff;transition:var(--transition);outline:none
+  }
+  .search-wrap input::placeholder{color:#777}
+  .search-wrap input:focus{background:#222;border-color:var(--primary)}
+  .search-btn{
+    position:absolute;right:6px;top:50%;transform:translateY(-50%);
+    background:var(--primary);color:#fff;border:none;width:34px;height:34px;border-radius:50%;
+    cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;font-size:14px
+  }
+  .search-btn:hover{background:var(--primary-dark);transform:translateY(-50%) scale(1.08)}
+  .suggestions{
+    position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border-radius:12px;
+    box-shadow:var(--shadow-md);border:1px solid #eee;overflow:hidden;
+    max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.2s ease;pointer-events:none
+  }
+  .suggestions.open{max-height:260px;opacity:1;pointer-events:all}
+  .sug-label{font-size:11px;font-weight:700;letter-spacing:0.6px;color:#999;text-transform:uppercase;padding:12px 16px 6px}
+  .sug-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background 0.15s;font-size:14px;color:#333}
+  .sug-item:hover{background:#fafafa}
+  .sug-item .ico{color:#bbb;font-size:13px}
+  /* USER NAV */
+  .user-nav{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .u-btn{
+    display:flex;align-items:center;gap:6px;color:#fff;text-decoration:none;
+    padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;
+    transition:var(--transition);border:1px solid transparent;background:none;white-space:nowrap
+  }
+  .u-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12)}
+  .u-btn.cart{background:var(--primary);border-color:var(--primary);font-weight:600}
+  .u-btn.cart:hover{background:var(--primary-dark)}
+  .badge{
+    background:#fff;color:var(--primary);font-size:10px;font-weight:700;
+    width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center
+  }
+  /* NAV MENU */
+  .nav-menu{background:var(--nav-bg);border-top:1px solid rgba(255,255,255,0.05)}
+  .nav-inner{max-width:1400px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .nav-inner::-webkit-scrollbar{display:none}
+  .nav-link{
+    color:#ccc;font-size:13px;text-decoration:none;padding:12px 14px;white-space:nowrap;
+    display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;transition:var(--transition)
+  }
+  .nav-link:hover,.nav-link.active{color:#fff;border-bottom-color:var(--primary)}
+  .nav-link.cat-btn{background:var(--primary);color:#fff;border-radius:6px 6px 0 0;margin-right:8px}
+  .nav-link.cat-btn:hover{background:var(--primary-dark);border-bottom-color:transparent}
+  /* FLASH BANNER */
+  .flash{
+    background:linear-gradient(90deg,#1a0a2e,#2d1b69,#1a0a2e);margin:24px auto;max-width:1400px;
+    border-radius:14px;padding:0;overflow:hidden;display:flex;align-items:center;
+    border:1px solid rgba(255,255,255,0.08)
+  }
+  .flash-left{background:rgba(255,68,68,0.9);padding:16px 24px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .flash-badge{font-weight:800;font-size:18px;color:#fff;letter-spacing:0.5px}
+  .flash-sub{font-size:11px;color:rgba(255,255,255,0.8);font-weight:600;letter-spacing:1px;text-transform:uppercase}
+  .flash-center{padding:16px 24px;flex:1}
+  .flash-title{color:#fff;font-size:20px;font-weight:700}
+  .flash-desc{color:rgba(255,255,255,0.6);font-size:13px;margin-top:2px}
+  .countdown{display:flex;gap:8px;align-items:center}
+  .cd-block{background:rgba(0,0,0,0.4);border-radius:6px;padding:6px 10px;text-align:center}
+  .cd-num{color:#fff;font-size:20px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+  .cd-label{color:rgba(255,255,255,0.5);font-size:10px;letter-spacing:0.5px}
+  .cd-sep{color:rgba(255,255,255,0.4);font-size:18px;font-weight:700;margin-bottom:2px}
+  /* PRODUCTS */
+  .section-head{max-width:1400px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .section-title{font-size:20px;font-weight:700;color:#1a1a1a;display:flex;align-items:center;gap:10px}
+  .section-title span{color:var(--primary)}
+  .see-all{color:var(--primary);font-size:13px;text-decoration:none;font-weight:600;transition:var(--transition)}
+  .see-all:hover{opacity:0.75}
+  .products{max-width:1400px;margin:0 auto;padding:0 24px 32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+  .pcard{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #eee;transition:var(--transition);cursor:pointer;position:relative}
+  .pcard:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.12);border-color:transparent}
+  .pcard-img{aspect-ratio:4/3;background:#f8f8f8;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden}
+  .discount{position:absolute;top:10px;left:10px;background:var(--primary);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px}
+  .wishlist-btn{position:absolute;top:10px;right:10px;background:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:#ccc;transition:var(--transition);box-shadow:var(--shadow-sm)}
+  .wishlist-btn:hover{color:var(--primary);transform:scale(1.1)}
+  .pcard-body{padding:14px}
+  .pcard-name{font-size:13px;color:#444;margin-bottom:8px;line-height:1.4;font-weight:400}
+  .pcard-price{display:flex;align-items:baseline;gap:8px}
+  .price-new{font-size:18px;font-weight:700;color:var(--primary)}
+  .price-old{font-size:13px;color:#bbb;text-decoration:line-through}
+  .add-cart{width:100%;margin-top:10px;padding:9px;background:#0a0a0a;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:6px}
+  .add-cart:hover{background:var(--primary)}
+  .stars{font-size:11px;color:#f5a623;margin-bottom:4px}
+  .star-count{color:#bbb;font-size:11px;margin-left:3px}
+
+  /* SIDEBAR */
+  .sidebar{
+    position:fixed;left:0;top:0;height:100vh;width:280px;background:#fff;z-index:200;
+    transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow:4px 0 40px rgba(0,0,0,0.15);overflow-y:auto
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-head{padding:18px 20px;background:#0a0a0a;display:flex;align-items:center;justify-content:space-between}
+  .sidebar-head h2{color:#fff;font-size:15px;font-weight:700}
+  .close-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+  .close-btn:hover{background:var(--primary)}
+  .cat-item{display:flex;align-items:center;gap:12px;padding:13px 20px;border-bottom:1px solid #f5f5f5;cursor:pointer;color:#333;font-size:14px;transition:var(--transition)}
+  .cat-item:hover{background:#fff5f5;color:var(--primary);padding-left:26px}
+  .cat-item .ci{font-size:18px;width:24px;text-align:center}
+  .cat-item .arr{margin-left:auto;color:#ddd;font-size:12px}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:150;opacity:0;visibility:hidden;transition:var(--transition)}
+  .overlay.open{opacity:1;visibility:visible}
+</style>
+
+<div class="header">
+  <div class="top-bar">
+    <a href="#" class="logo">Buy2<span>Express</span></a>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search products, brands, categories..." autocomplete="off">
+      <button class="search-btn">🔍</button>
+      <div class="suggestions" id="suggestions">
+        <div class="sug-label">Recent</div>
+        <div class="sug-item"><span class="ico">🕐</span> wireless earbuds</div>
+        <div class="sug-item"><span class="ico">🕐</span> gaming laptop</div>
+        <div class="sug-label">Trending</div>
+        <div class="sug-item"><span class="ico">🔥</span> iPhone 16 Pro</div>
+        <div class="sug-item"><span class="ico">🔥</span> Nike Air Max 2025</div>
+        <div class="sug-item"><span class="ico">🔥</span> Samsung 4K TV</div>
+      </div>
+    </div>
+    <div class="user-nav">
+      <a href="#" class="u-btn">👤 Account</a>
+      <a href="#" class="u-btn">❤️ Wishlist</a>
+      <a href="#" class="u-btn cart">🛒 Cart <span class="badge">3</span></a>
+    </div>
+  </div>
+  <nav class="nav-menu">
+    <div class="nav-inner">
+      <a href="#" class="nav-link cat-btn" id="catToggle">☰ All Categories</a>
+      <a href="#" class="nav-link active">Home</a>
+      <a href="#" class="nav-link">Electronics</a>
+      <a href="#" class="nav-link">Fashion</a>
+      <a href="#" class="nav-link">Home & Living</a>
+      <a href="#" class="nav-link">Beauty</a>
+      <a href="#" class="nav-link">Sports</a>
+      <a href="#" class="nav-link">Brands</a>
+    </div>
+  </nav>
+</div>
+
+<div style="background:#f5f5f5;padding:0 0 40px">
+  <!-- Flash Sale -->
+  <div class="flash">
+    <div class="flash-left">
+      <div>
+        <div class="flash-badge">⚡ FLASH SALE</div>
+        <div class="flash-sub">Limited time</div>
+      </div>
+    </div>
+    <div class="flash-center">
+      <div class="flash-title">Up to 70% OFF on Electronics</div>
+      <div class="flash-desc">New deals drop every hour — don't miss out</div>
+    </div>
+    <div style="padding:16px 24px">
+      <div class="countdown" id="countdown">
+        <div class="cd-block"><div class="cd-num" id="ch">05</div><div class="cd-label">HRS</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-block"><div class="cd-num" id="cm">43</div><div class="cd-label">MIN</div></div>
+        <div class="cd-sep">:</div>
+        <div class="cd-block"><div class="cd-num" id="cs">22</div><div class="cd-label">SEC</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products -->
+  <div class="section-head">
+    <div class="section-title">🔥 Today's <span>Best Deals</span></div>
+    <a href="#" class="see-all">View all →</a>
+  </div>
+  <div class="products" id="products"></div>
+</div>
+
+<!-- Sidebar -->
+<div class="overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <h2>All Categories</h2>
+    <button class="close-btn" id="closeBtn">✕</button>
+  </div>
+  <div class="cat-item"><span class="ci">📱</span> Electronics <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">👗</span> Fashion <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">🏠</span> Home & Living <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">💄</span> Beauty & Health <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">⚽</span> Sports & Outdoors <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">📚</span> Books & Education <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">🎮</span> Gaming <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">🚗</span> Automotive <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">🐾</span> Pet Supplies <span class="arr">›</span></div>
+  <div class="cat-item"><span class="ci">🍳</span> Kitchen & Dining <span class="arr">›</span></div>
+</aside>
+
+<script>
+const products = [
+  {name:"Sony WH-1000XM5 Wireless Headphones",price:"Rs 45,999",old:"Rs 62,000",disc:"26% OFF",emoji:"🎧",stars:5,reviews:2341},
+  {name:"Samsung Galaxy S24 Ultra 512GB",price:"Rs 189,999",old:"Rs 229,000",disc:"17% OFF",emoji:"📱",stars:5,reviews:4102},
+  {name:"Apple MacBook Air M3",price:"Rs 279,000",old:"Rs 319,000",disc:"12% OFF",emoji:"💻",stars:4,reviews:876},
+  {name:"Nike Air Max 270 Running Shoes",price:"Rs 18,500",old:"Rs 24,000",disc:"23% OFF",emoji:"👟",stars:4,reviews:3210},
+  {name:"Dyson V15 Detect Vacuum",price:"Rs 89,000",old:"Rs 115,000",disc:"22% OFF",emoji:"🌀",stars:5,reviews:621},
+  {name:"Instant Pot Duo 7-in-1",price:"Rs 12,999",old:"Rs 17,500",disc:"26% OFF",emoji:"🍲",stars:4,reviews:1894},
+];
+
+const grid = document.getElementById('products');
+products.forEach(p => {
+  const starsHtml = '★'.repeat(p.stars) + '☆'.repeat(5-p.stars);
+  grid.innerHTML += `
+  <div class="pcard">
+    <div class="pcard-img">
+      <span class="discount">${p.disc}</span>
+      <span style="font-size:52px">${p.emoji}</span>
+      <button class="wishlist-btn">♡</button>
+    </div>
+    <div class="pcard-body">
+      <div class="stars">${starsHtml}<span class="star-count">(${p.reviews.toLocaleString()})</span></div>
+      <div class="pcard-name">${p.name}</div>
+      <div class="pcard-price"><span class="price-new">${p.price}</span><span class="price-old">${p.old}</span></div>
+      <button class="add-cart" onclick="this.textContent='✓ Added!';this.style.background='#22a06b';setTimeout(()=>{this.textContent='🛒 Add to Cart';this.style.background=''},1800)">🛒 Add to Cart</button>
+    </div>
+  </div>`;
+});
+
+// Sidebar
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+document.getElementById('catToggle').addEventListener('click', e => {
+  e.preventDefault();
+  sidebar.classList.add('open');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+function closeSidebar(){
+  sidebar.classList.remove('open');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('closeBtn').addEventListener('click', closeSidebar);
+overlay.addEventListener('click', closeSidebar);
+
+// Search suggestions
+const inp = document.getElementById('searchInput');
+const sug = document.getElementById('suggestions');
+inp.addEventListener('focus', () => sug.classList.add('open'));
+document.addEventListener('click', e => {
+  if(!inp.contains(e.target) && !sug.contains(e.target)) sug.classList.remove('open');
+});
+document.querySelectorAll('.sug-item').forEach(item => {
+  item.addEventListener('click', () => {
+    inp.value = item.textContent.trim();
+    sug.classList.remove('open');
+  });
+});
+
+// Countdown
+let totalSec = 5*3600 + 43*60 + 22;
+setInterval(() => {
+  totalSec--;
+  if(totalSec < 0) totalSec = 6*3600;
+  const h = Math.floor(totalSec/3600), m = Math.floor((totalSec%3600)/60), s = totalSec%60;
+  document.getElementById('ch').textContent = String(h).padStart(2,'0');
+  document.getElementById('cm').textContent = String(m).padStart(2,'0');
+  document.getElementById('cs').textContent = String(s).padStart(2,'0');
+}, 1000);
+
+// Wishlist toggle
+document.querySelectorAll('.wishlist-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const active = btn.textContent === '♥';
+    btn.textContent = active ? '♡' : '♥';
+    btn.style.color = active ? '#ccc' : '#ff4444';
+  });
+});
+</script>

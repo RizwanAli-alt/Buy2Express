@@ -1,200 +1,344 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | Buy2Express</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        *, *::before, *::after {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
 
         :root {
-            --primary: #ff4747;
-            --gradient: linear-gradient(135deg, #ff4747, #ff7676);
-            --shadow: 0 8px 25px rgba(0,0,0,0.1);
+            --primary:        #F5A623;
+            --primary-dark:   #E09518;
+            --primary-light:  #FFC85A;
+            --secondary:      #1A1D2E;
+            --secondary-soft: #252840;
+            --accent:         #6C63FF;
+            --bg-page:        #F5F4F0;
+            --bg-card:        #FFFFFF;
+            --text-dark:      #1A1D2E;
+            --text-muted:     #7B7E92;
+            --border:         #E8E7E2;
+            --shadow-sm:      0 2px 8px rgba(26,29,46,0.08);
+            --shadow-md:      0 6px 20px rgba(26,29,46,0.12);
+            --shadow-lg:      0 16px 40px rgba(26,29,46,0.16);
+            --transition:     all 0.3s cubic-bezier(0.4,0,0.2,1);
+            --transition-fast:all 0.15s cubic-bezier(0.4,0,0.2,1);
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
             min-height: 100vh;
-            background: linear-gradient(45deg, #f3f4f6, #fff);
+            background: var(--bg-page);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::before {
+            width: 520px; height: 520px;
+            top: -160px; right: -160px;
+            background: radial-gradient(circle, rgba(245,166,35,0.10) 0%, transparent 70%);
+        }
+        body::after {
+            width: 400px; height: 400px;
+            bottom: -120px; left: -120px;
+            background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 70%);
         }
 
         .card {
             width: 100%;
-            max-width: 440px;
-            background: white;
+            max-width: 460px;
+            background: var(--bg-card);
             border-radius: 20px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
-            animation: fadeUp 0.6s ease;
+            position: relative;
+            z-index: 1;
+            animation: cardUp 0.55s cubic-bezier(0.34,1.2,0.64,1) both;
+            border: 1px solid var(--border);
+        }
+        @keyframes cardUp {
+            from { opacity: 0; transform: translateY(32px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)    scale(1); }
         }
 
         .card-header {
-            background: var(--gradient);
-            padding: 30px;
+            background: var(--secondary);
+            padding: 30px 32px 26px;
             text-align: center;
-            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+            background-size: 200%;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            from { background-position: 200% center; }
+            to   { background-position: -200% center; }
         }
 
         .logo {
-            font-size: 26px;
-            font-weight: bold;
+            font-size: 27px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            text-decoration: none;
+        }
+        .logo span { color: var(--primary); }
+        .logo i {
+            color: var(--primary);
+            font-size: 22px;
+            animation: iconBounce 2.5s ease-in-out infinite;
+        }
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-4px); }
+        }
+        .card-header p {
+            color: rgba(255,255,255,0.65);
+            font-size: 14px;
         }
 
-        .logo i { animation: spin 3s linear infinite; }
+        .card-body { padding: 30px 32px; }
 
-        .card-header p { opacity: 0.9; font-size: 15px; }
-
-        .card-body { padding: 35px 30px; }
-
-        /* Error / success messages */
-        .messages { margin-bottom: 20px; }
+        /* Messages */
+        .messages { margin-bottom: 18px; }
         .msg {
-            padding: 11px 15px;
+            padding: 10px 14px;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 8px;
+            animation: msgPop 0.35s ease both;
         }
-        .msg.error   { background: #fff0f0; color: #d63031; border-left: 3px solid #d63031; }
-        .msg.success { background: #f0fff4; color: #00b894; border-left: 3px solid #00b894; }
+        @keyframes msgPop {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .msg.error   { background: #fff5f5; color: #c0392b; border-left: 3px solid #c0392b; }
+        .msg.success { background: #f0fff8; color: #00875a; border-left: 3px solid #00875a; }
 
-        /* Form fields */
-        .field { margin-bottom: 20px; }
-        .field label { display: block; font-size: 13px; color: #555; margin-bottom: 7px; font-weight: 500; }
+        /* Fields */
+        .field { margin-bottom: 18px; }
+        .field label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 7px;
+            letter-spacing: 0.2px;
+        }
 
         .input-wrap { position: relative; }
         .input-wrap input {
             width: 100%;
-            padding: 13px 45px 13px 16px;
-            border: 2px solid #eee;
+            padding: 13px 46px 13px 16px;
+            border: 2px solid var(--border);
             border-radius: 12px;
             font-size: 15px;
-            transition: border-color 0.25s, box-shadow 0.25s;
+            color: var(--text-dark);
+            background: var(--bg-page);
             outline: none;
+            transition: var(--transition);
         }
+        .input-wrap input::placeholder { color: var(--text-muted); font-size: 14px; }
         .input-wrap input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(255,71,71,0.1);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(245,166,35,0.12);
         }
-        .input-wrap input.is-invalid { border-color: #d63031; }
-
+        .input-wrap input.is-invalid {
+            border-color: #c0392b;
+            box-shadow: 0 0 0 4px rgba(192,57,43,0.08);
+        }
         .input-wrap .icon {
             position: absolute;
-            right: 14px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #bbb;
+            color: var(--text-muted);
             font-size: 15px;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: var(--transition-fast);
         }
         .input-wrap input:focus ~ .icon { color: var(--primary); }
 
-        .field-error { font-size: 12px; color: #d63031; margin-top: 5px; display: none; }
-        .field-error.show { display: block; }
+        .field-error {
+            font-size: 12px;
+            color: #c0392b;
+            margin-top: 5px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+        .field-error.show { display: flex; }
+
+        /* Password strength bar */
+        .strength-bar {
+            height: 4px;
+            border-radius: 4px;
+            background: var(--border);
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%;
+            width: 0;
+            border-radius: 4px;
+            transition: width 0.4s ease, background 0.4s ease;
+        }
+        .strength-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
 
         /* Submit button */
         .btn-submit {
             width: 100%;
             padding: 14px;
-            background: var(--gradient);
+            background: var(--secondary);
+            color: white;
             border: none;
             border-radius: 12px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 5px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
         }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,71,71,0.4); }
-        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .btn-submit:hover::after { opacity: 1; }
+        .btn-submit span { position: relative; z-index: 1; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,166,35,0.35); }
+        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         /* Divider */
         .divider {
             text-align: center;
-            margin: 22px 0;
+            margin: 20px 0;
             position: relative;
-            color: #bbb;
-            font-size: 13px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
         }
         .divider::before, .divider::after {
             content: '';
             position: absolute;
             top: 50%;
-            width: 43%;
+            width: 40%;
             height: 1px;
-            background: #eee;
+            background: var(--border);
         }
         .divider::before { left: 0; }
-        .divider::after { right: 0; }
+        .divider::after  { right: 0; }
 
         /* Social */
         .social { display: flex; gap: 12px; justify-content: center; margin-bottom: 22px; }
         .social-btn {
             width: 48px; height: 48px;
             border-radius: 12px;
-            border: 2px solid #eee;
+            border: 2px solid var(--border);
             display: flex; align-items: center; justify-content: center;
-            font-size: 18px; color: #888;
+            font-size: 18px;
+            color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.25s;
+            transition: var(--transition);
+            background: var(--bg-page);
         }
-        .social-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,0,0,0.1); }
-        .social-btn.google:hover   { color: #DB4437; border-color: #DB4437; }
-        .social-btn.facebook:hover { color: #4267B2; border-color: #4267B2; }
-        .social-btn.twitter:hover  { color: #1DA1F2; border-color: #1DA1F2; }
+        .social-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .social-btn.google:hover   { color: #DB4437; border-color: #DB4437; background: #fff5f4; }
+        .social-btn.facebook:hover { color: #4267B2; border-color: #4267B2; background: #f4f6ff; }
+        .social-btn.twitter:hover  { color: #1DA1F2; border-color: #1DA1F2; background: #f0f9ff; }
 
-        .footer-link { text-align: center; font-size: 14px; color: #777; }
-        .footer-link a { color: var(--primary); font-weight: 600; text-decoration: none; margin-left: 4px; }
-        .footer-link a:hover { text-decoration: underline; }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
+        .footer-link {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
         }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to   { transform: rotate(360deg); }
+        .footer-link a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+            transition: var(--transition-fast);
+        }
+        .footer-link a:hover { color: var(--primary-dark); text-decoration: underline; }
+
+        @media (max-width: 480px) {
+            .card-body, .card-header { padding-left: 20px; padding-right: 20px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.1ms !important; }
         }
     </style>
 </head>
 <body>
+
 <div class="card">
     <div class="card-header">
-        <div class="logo">
+        <a href="{% url 'home' %}" class="logo">
             <i class="fas fa-shopping-bag"></i>
-            Buy2Express
-        </div>
+            Buy2<span>Express</span>
+        </a>
         <p>Create your account and start shopping</p>
     </div>
 
     <div class="card-body">
 
-        <!-- Django messages (server-side errors) -->
         {% if messages %}
         <div class="messages">
             {% for message in messages %}
             <div class="msg {{ message.tags }}">
-                <i class="fas fa-exclamation-circle"></i> {{ message }}
+                <i class="fas fa-circle-info"></i> {{ message }}
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        <!-- Form errors from Django -->
         {% if form.errors %}
         <div class="messages">
             {% for field in form %}
@@ -220,7 +364,8 @@
                 <div class="input-wrap">
                     <input type="text" id="username" name="username"
                            value="{{ form.username.value|default:'' }}"
-                           placeholder="Choose a username" required>
+                           placeholder="Choose a username" required autofocus
+                           autocomplete="username">
                     <i class="fas fa-user icon"></i>
                 </div>
             </div>
@@ -230,7 +375,8 @@
                 <div class="input-wrap">
                     <input type="email" id="email" name="email"
                            value="{{ form.email.value|default:'' }}"
-                           placeholder="Enter your email" required>
+                           placeholder="you@example.com" required
+                           autocomplete="email">
                     <i class="fas fa-envelope icon"></i>
                 </div>
             </div>
@@ -239,42 +385,49 @@
                 <label for="password">Password</label>
                 <div class="input-wrap">
                     <input type="password" id="password" name="password"
-                           placeholder="Min 8 characters" required>
+                           placeholder="Min 8 characters" required
+                           autocomplete="new-password">
                     <i class="fas fa-lock icon" id="togglePwd1"></i>
                 </div>
+                <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                <div class="strength-label" id="strengthLabel"></div>
             </div>
 
             <div class="field">
                 <label for="confirm_password">Confirm Password</label>
                 <div class="input-wrap">
                     <input type="password" id="confirm_password" name="confirm_password"
-                           placeholder="Repeat your password" required>
+                           placeholder="Repeat your password" required
+                           autocomplete="new-password">
                     <i class="fas fa-lock icon" id="togglePwd2"></i>
                 </div>
-                <div class="field-error" id="pwdError">Passwords do not match!</div>
+                <div class="field-error" id="pwdError">
+                    <i class="fas fa-circle-xmark"></i> Passwords do not match!
+                </div>
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">
-                Create Account
+                <span>Create Account</span>
             </button>
         </form>
 
         <div class="divider">OR</div>
 
         <div class="social">
-            <div class="social-btn google"><i class="fab fa-google"></i></div>
-            <div class="social-btn facebook"><i class="fab fa-facebook-f"></i></div>
-            <div class="social-btn twitter"><i class="fab fa-twitter"></i></div>
+            <div class="social-btn google" title="Continue with Google"><i class="fab fa-google"></i></div>
+            <div class="social-btn facebook" title="Continue with Facebook"><i class="fab fa-facebook-f"></i></div>
+            <div class="social-btn twitter" title="Continue with Twitter"><i class="fab fa-twitter"></i></div>
         </div>
 
         <div class="footer-link">
             Already have an account? <a href="{% url 'authentication:login' %}">Login</a>
         </div>
+
     </div>
 </div>
 
 <script>
-    // Password visibility toggles
+    // Toggle password 1
     document.getElementById('togglePwd1').addEventListener('click', function () {
         const input = document.getElementById('password');
         const show = input.type === 'password';
@@ -282,11 +435,36 @@
         this.className = show ? 'fas fa-lock-open icon' : 'fas fa-lock icon';
     });
 
+    // Toggle password 2
     document.getElementById('togglePwd2').addEventListener('click', function () {
         const input = document.getElementById('confirm_password');
         const show = input.type === 'password';
         input.type = show ? 'text' : 'password';
         this.className = show ? 'fas fa-lock-open icon' : 'fas fa-lock icon';
+    });
+
+    // Password strength meter
+    document.getElementById('password').addEventListener('input', function () {
+        const val = this.value;
+        const fill = document.getElementById('strengthFill');
+        const label = document.getElementById('strengthLabel');
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        const levels = [
+            { width: '0%',   color: 'transparent', text: '' },
+            { width: '25%',  color: '#e74c3c',      text: 'Weak' },
+            { width: '50%',  color: '#e67e22',      text: 'Fair' },
+            { width: '75%',  color: '#f5a623',      text: 'Good' },
+            { width: '100%', color: '#27ae60',      text: 'Strong' },
+        ];
+        fill.style.width  = levels[score].width;
+        fill.style.background = levels[score].color;
+        label.textContent = levels[score].text;
+        label.style.color = levels[score].color;
     });
 
     // Live password match check
@@ -304,9 +482,9 @@
 
     // Form submit validation
     document.getElementById('signupForm').addEventListener('submit', function (e) {
-        const pwd = document.getElementById('password').value;
+        const pwd  = document.getElementById('password').value;
         const cpwd = document.getElementById('confirm_password').value;
-        const err = document.getElementById('pwdError');
+        const err  = document.getElementById('pwdError');
 
         if (pwd !== cpwd) {
             e.preventDefault();
@@ -315,11 +493,11 @@
             return;
         }
 
-        // All good — show loading
         const btn = document.getElementById('submitBtn');
-        btn.textContent = 'Creating account...';
+        btn.querySelector('span').textContent = 'Creating account…';
         btn.disabled = true;
     });
 </script>
+
 </body>
 </html>

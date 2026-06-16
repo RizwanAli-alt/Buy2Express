@@ -5,528 +5,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Buy2Express{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-
-        :root {
-            --primary-color: #ff4747;
-            --secondary-color: #333;
-            --background-light: #f8f8f8;
-            --text-dark: #333;
-            --text-light: #666;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: #000;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: var(--shadow);
-        }
-
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .logo:hover {
-            color: var(--primary-color);
-        }
-
-        .search-bar {
-            flex: 1;
-            max-width: 600px;
-            margin: 0 30px;
-            position: relative;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 12px 45px 12px 15px;
-            border-radius: 25px;
-            border: none;
-            font-size: 15px;
-            transition: var(--transition);
-        }
-
-        .search-bar input:focus {
-            outline: none;
-            box-shadow: inset 0 0 0 2px var(--primary-color);
-        }
-
-        .search-bar button {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .search-bar button:hover {
-            background: #ff3333;
-        }
-
-        .user-nav {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            color: white;
-        }
-
-        .nav-item {
-            position: relative;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .nav-item:hover {
-            color: var(--primary-color);
-        }
-
-        .dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            min-width: 200px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: var(--transition);
-        }
-
-        .nav-item:hover .dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .dropdown a {
-            display: block;
-            padding: 12px 20px;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .dropdown a:hover {
-            background: var(--background-light);
-            color: var(--primary-color);
-        }
-
-        /* Categories Navigation */
-        .nav-menu {
-            background: var(--secondary-color);
-            padding: 0 20px;
-        }
-
-        .nav-menu .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .nav-menu ul {
-            list-style: none;
-            display: flex;
-            gap: 30px;
-            padding: 15px 0;
-        }
-
-        .nav-menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 15px;
-            transition: var(--transition);
-            padding: 5px 0;
-            position: relative;
-        }
-
-        .nav-menu a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-color);
-            transition: var(--transition);
-        }
-
-        .nav-menu a:hover::after {
-            width: 100%;
-        }
-
-        /* Flash Sale Banner */
-        .flash-sale {
-            background: linear-gradient(135deg, #9c27b0, #673ab7);
-            margin: 30px auto;
-            max-width: 1400px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        /* Product Grid */
-        .deals-section {
-            max-width: 1400px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            padding: 0 20px;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .product-image {
-            position: relative;
-            padding-top: 75%;
-            overflow: hidden;
-        }
-
-        .product-image img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .product-card:hover .product-image img {
-            transform: scale(1.05);
-        }
-
-        .product-info {
-            padding: 20px;
-        }
-
-        .product-title {
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: var(--text-dark);
-        }
-
-        .product-price {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .original-price {
-            color: var(--text-light);
-            text-decoration: line-through;
-            margin-left: 10px;
-            font-size: 16px;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--secondary-color);
-            color: white;
-            padding: 60px 20px 30px;
-            margin-top: 60px;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
-
-        .footer-section h3 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        .footer-section h3::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 2px;
-            background: var(--primary-color);
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section li {
-            margin-bottom: 12px;
-        }
-
-        .footer-section a {
-            color: #ccc;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-section a:hover {
-            color: var(--primary-color);
-            padding-left: 5px;
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .social-icons i {
-            font-size: 24px;
-            transition: var(--transition);
-        }
-
-        .social-icons i:hover {
-            color: var(--primary-color);
-            transform: translateY(-3px);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding: 20px;
-            margin-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Sidebar & Overlay */
-        .categories-sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100vh;
-            width: 300px;
-            background: white;
-            box-shadow: var(--shadow);
-            transform: translateX(-100%);
-            transition: var(--transition);
-            z-index: 1001;
-            overflow-y: auto;
-        }
-
-        .categories-sidebar.active {
-            transform: translateX(0);
-        }
-
-        .categories-header {
-            padding: 20px;
-            background: var(--background-light);
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .close-categories {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-dark);
-        }
-
-        .category-item {
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .category-item i {
-            margin-right: 15px;
-            width: 20px;
-            color: #666;
-        }
-
-        .category-item:hover {
-            background: var(--background-light);
-            padding-left: 25px;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-            z-index: 1000;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Search Suggestions */
-        .search-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin-top: 5px;
-            display: none;
-            z-index: 1000;
-        }
-
-        .search-suggestions.active {
-            display: block;
-        }
-
-        .suggestions-section {
-            padding: 15px;
-        }
-
-        .suggestions-section h3 {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .suggestion-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 15px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .suggestion-item:hover {
-            background: #f5f5f5;
-        }
-
-        .suggestion-item i {
-            color: #999;
-            margin-right: 10px;
-            font-size: 14px;
-        }
-
-        @media (max-width: 768px) {
-            .top-header {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .search-bar {
-                margin: 15px 0;
-                max-width: 100%;
-            }
-
-            .nav-menu ul {
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-
-            .deals-section {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            }
-        }
-    </style>
+    <meta name="description" content="{% block meta_description %}Buy2Express — Premium shopping, fast delivery.{% endblock %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header>
+
+    <!-- ══════════════════════════════════════════════════
+         HEADER
+    ══════════════════════════════════════════════════ -->
+    <header role="banner">
         <div class="top-header">
-            <a href="{% url 'home' %}" class="logo">Buy2Express</a>
-            <div class="search-bar">
-                <input type="text" placeholder="Search for products, brands and more...">
-                <button><i class="fas fa-search"></i></button>
-                <div class="search-suggestions">
+
+            <!-- Logo -->
+            <a href="{% url 'home' %}" class="logo" aria-label="Buy2Express Home">
+                Buy2<span>Express</span>
+            </a>
+
+            <!-- Search -->
+            <div class="search-bar" role="search">
+                <input
+                    type="text"
+                    id="site-search"
+                    placeholder="Search for products, brands and more..."
+                    autocomplete="off"
+                    aria-label="Search products"
+                    aria-haspopup="listbox"
+                    aria-controls="search-suggestions"
+                    aria-expanded="false"
+                >
+                <button type="button" aria-label="Submit search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                </button>
+
+                <!-- Search Suggestions Dropdown -->
+                <div class="search-suggestions" id="search-suggestions" role="listbox" aria-label="Search suggestions">
                     <div class="suggestions-section">
                         <h3>Recent Searches</h3>
-                        <div class="suggestion-item">
-                            <i class="fas fa-history"></i>
+                        <div class="suggestion-item" role="option" tabindex="0">
+                            <i class="fas fa-history" aria-hidden="true"></i>
                             <span>wireless earbuds</span>
                         </div>
-                        <div class="suggestion-item">
-                            <i class="fas fa-history"></i>
+                        <div class="suggestion-item" role="option" tabindex="0">
+                            <i class="fas fa-history" aria-hidden="true"></i>
                             <span>gaming laptop</span>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="user-nav">
-                <div class="nav-item">
-                    <i class="fas fa-user"></i>
-                    <span>Account</span>
-                    <div class="dropdown">
-                        <a href="{% url 'authentication:profile' %}"><i class="fas fa-user"></i> Profile</a>
-                        <a href="{% url 'cart_and_orders:orders' %}"><i class="fas fa-box"></i> Orders</a>
-                        <a href="{% url 'wishlist:wishlist_view' %}"><i class="fas fa-heart"></i> Wishlist</a>
-                        <a href="{% url 'authentication:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <div class="suggestions-section">
+                        <h3>Trending</h3>
+                        <div class="suggestion-item" role="option" tabindex="0">
+                            <i class="fas fa-fire" aria-hidden="true"></i>
+                            <span>smartwatch</span>
+                        </div>
+                        <div class="suggestion-item" role="option" tabindex="0">
+                            <i class="fas fa-fire" aria-hidden="true"></i>
+                            <span>running shoes</span>
+                        </div>
+                        <div class="suggestion-item" role="option" tabindex="0">
+                            <i class="fas fa-fire" aria-hidden="true"></i>
+                            <span>air fryer</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- User Nav -->
+            <nav class="user-nav" aria-label="User navigation">
+
+                <!-- Account -->
+                <div class="nav-item" role="button" tabindex="0" aria-haspopup="true" aria-label="Account menu">
+                    <i class="fas fa-user" aria-hidden="true"></i>
+                    <span>Account</span>
+                    <div class="dropdown" role="menu">
+                        <a href="{% url 'authentication:profile' %}" role="menuitem">
+                            <i class="fas fa-user" aria-hidden="true"></i> Profile
+                        </a>
+                        <a href="{% url 'cart_and_orders:orders' %}" role="menuitem">
+                            <i class="fas fa-box" aria-hidden="true"></i> Orders
+                        </a>
+                        <a href="{% url 'wishlist:wishlist_view' %}" role="menuitem">
+                            <i class="fas fa-heart" aria-hidden="true"></i> Wishlist
+                        </a>
+                        <a href="{% url 'authentication:logout' %}" role="menuitem">
+                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cart -->
                 <div class="nav-item">
-                    <a href="{% url 'cart_and_orders:cart_view' %}" style="color: inherit; text-decoration: none;">
-                        <i class="fas fa-shopping-cart"></i>
+                    <a href="{% url 'cart_and_orders:cart_view' %}" class="cart-link" aria-label="Shopping cart">
+                        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                        {% if cart_count and cart_count > 0 %}
+                            <span class="cart-badge" aria-label="{{ cart_count }} items in cart">{{ cart_count }}</span>
+                        {% endif %}
                         <span>Cart</span>
                     </a>
                 </div>
-            </div>
+
+            </nav>
         </div>
-        <nav class="nav-menu">
+
+        <!-- Primary Nav -->
+        <nav class="nav-menu" aria-label="Primary navigation">
             <div class="container">
-                <ul>
-                    <li><button class="category-toggle"><i class="fas fa-bars"></i> Categories</button></li>
+                <ul role="list">
+                    <li>
+                        <button class="category-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="categories-sidebar">
+                            <i class="fas fa-bars" aria-hidden="true"></i> Categories
+                        </button>
+                    </li>
                     <li><a href="{% url 'product_management:products' %}">Products</a></li>
                     <li><a href="{% url 'product_management:category_list' %}">Categories</a></li>
                     <li><a href="{% url 'product_management:brand_list' %}">Brands</a></li>
-                    <li><a href="#">Home & Living</a></li>
+                    <li><a href="#">Home &amp; Living</a></li>
                     <li><a href="#">Beauty</a></li>
                     <li><a href="#">More</a></li>
                 </ul>
@@ -534,146 +127,136 @@
         </nav>
     </header>
 
-    <main>
-        {% block content %}
-        <div class="flash-sale">
-            <img src="/api/placeholder/1400/400" alt="Flash Sale Banner">
-        </div>
-
-        <section class="deals-section">
-            {% for product in products %}
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">{{ product.name }}</h3>
-                    <div class="product-price">
-                        ${{ product.sale_price }}
-                        <span class="original-price">${{ product.original_price }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </section>
-        {% endblock %}
+    <!-- ══════════════════════════════════════════════════
+         MAIN CONTENT
+    ══════════════════════════════════════════════════ -->
+    <main id="main-content" role="main" tabindex="-1">
+        {% block content %}{% endblock %}
     </main>
 
-    <!-- Categories Sidebar -->
-    <div class="categories-sidebar">
+    <!-- ══════════════════════════════════════════════════
+         CATEGORIES SIDEBAR
+    ══════════════════════════════════════════════════ -->
+    <aside id="categories-sidebar" class="categories-sidebar" aria-label="All Categories" aria-hidden="true">
         <div class="categories-header">
             <h2>All Categories</h2>
-            <button class="close-categories">&times;</button>
+            <button class="close-categories" aria-label="Close categories menu">&times;</button>
         </div>
-        <ul class="category-list">
-            <li class="category-item">
-                <i class="fas fa-mobile-alt"></i>
-                Electronics
+        <ul class="category-list" role="list">
+            <li class="category-item" role="button" tabindex="0" data-category="electronics">
+                <i class="fas fa-mobile-alt" aria-hidden="true"></i>
+                <span>Electronics</span>
             </li>
-            <li class="category-item">
-                <i class="fas fa-tshirt"></i>
-                Fashion
+            <li class="category-item" role="button" tabindex="0" data-category="fashion">
+                <i class="fas fa-tshirt" aria-hidden="true"></i>
+                <span>Fashion</span>
             </li>
-            <li class="category-item">
-                <i class="fas fa-home"></i>
-                Home & Living
+            <li class="category-item" role="button" tabindex="0" data-category="home-living">
+                <i class="fas fa-home" aria-hidden="true"></i>
+                <span>Home &amp; Living</span>
             </li>
-            <li class="category-item">
-                <i class="fas fa-heartbeat"></i>
-                Beauty & Health
+            <li class="category-item" role="button" tabindex="0" data-category="beauty-health">
+                <i class="fas fa-heartbeat" aria-hidden="true"></i>
+                <span>Beauty &amp; Health</span>
             </li>
-            <li class="category-item">
-                <i class="fas fa-futbol"></i>
-                Sports
+            <li class="category-item" role="button" tabindex="0" data-category="sports">
+                <i class="fas fa-futbol" aria-hidden="true"></i>
+                <span>Sports</span>
+            </li>
+            <li class="category-item" role="button" tabindex="0" data-category="toys">
+                <i class="fas fa-gamepad" aria-hidden="true"></i>
+                <span>Toys &amp; Games</span>
+            </li>
+            <li class="category-item" role="button" tabindex="0" data-category="books">
+                <i class="fas fa-book" aria-hidden="true"></i>
+                <span>Books &amp; Stationery</span>
+            </li>
+            <li class="category-item" role="button" tabindex="0" data-category="groceries">
+                <i class="fas fa-shopping-basket" aria-hidden="true"></i>
+                <span>Groceries</span>
+            </li>
+            <li class="category-item" role="button" tabindex="0" data-category="automotive">
+                <i class="fas fa-car" aria-hidden="true"></i>
+                <span>Automotive</span>
+            </li>
+            <li class="category-item" role="button" tabindex="0" data-category="pets">
+                <i class="fas fa-paw" aria-hidden="true"></i>
+                <span>Pets</span>
             </li>
         </ul>
-    </div>
+    </aside>
 
-    <!-- Overlay -->
-    <div class="overlay"></div>
+    <!-- Overlay (sidebar backdrop) -->
+    <div class="overlay" aria-hidden="true" role="presentation"></div>
 
-    <footer>
+    <!-- ══════════════════════════════════════════════════
+         FOOTER
+    ══════════════════════════════════════════════════ -->
+    <footer role="contentinfo">
         <div class="footer-content">
+
             <div class="footer-section">
                 <h3>About Buy2Express</h3>
                 <ul>
                     <li><a href="#">About Us</a></li>
                     <li><a href="#">Careers</a></li>
-                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Press &amp; Blog</a></li>
+                    <li><a href="#">Sell With Us</a></li>
                 </ul>
             </div>
+
             <div class="footer-section">
                 <h3>Customer Service</h3>
                 <ul>
                     <li><a href="#">Help Center</a></li>
-                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Returns &amp; Refunds</a></li>
+                    <li><a href="#">Track My Order</a></li>
                     <li><a href="#">Contact Us</a></li>
                 </ul>
             </div>
+
             <div class="footer-section">
-                <h3>Privacy & Terms</h3>
+                <h3>Privacy &amp; Legal</h3>
                 <ul>
                     <li><a href="#">Privacy Policy</a></li>
                     <li><a href="#">Terms of Service</a></li>
                     <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Sitemap</a></li>
                 </ul>
             </div>
+
             <div class="footer-section">
                 <h3>Connect With Us</h3>
-                <div class="social-icons">
-                    <i class="fab fa-facebook"></i>
-                    <i class="fab fa-twitter"></i>
-                    <i class="fab fa-instagram"></i>
-                    <i class="fab fa-youtube"></i>
+                <ul>
+                    <li><a href="#"><i class="fas fa-envelope" aria-hidden="true"></i> Newsletter</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Store Locator</a></li>
+                </ul>
+                <div class="social-icons" role="list" aria-label="Social media links">
+                    <a href="#" role="listitem" aria-label="Facebook">
+                        <i class="fab fa-facebook" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" role="listitem" aria-label="Twitter / X">
+                        <i class="fab fa-twitter" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" role="listitem" aria-label="Instagram">
+                        <i class="fab fa-instagram" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" role="listitem" aria-label="YouTube">
+                        <i class="fab fa-youtube" aria-hidden="true"></i>
+                    </a>
                 </div>
             </div>
+
         </div>
+
         <div class="footer-bottom">
-            <p>&copy; {% now "Y" %} Buy2Express. All rights reserved.</p>
+            <p>&copy; {% now "Y" %} Buy2Express. All rights reserved. Built with ❤️ for great deals.</p>
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Sidebar Toggle
-            const categoryToggle = document.querySelector('.category-toggle');
-            const categoriesSidebar = document.querySelector('.categories-sidebar');
-            const overlay = document.querySelector('.overlay');
-            const closeButton = document.querySelector('.close-categories');
+    <!-- Scripts -->
+    <script src="{% static 'js/base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 
-            function toggleSidebar() {
-                categoriesSidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-
-            categoryToggle.addEventListener('click', toggleSidebar);
-            closeButton.addEventListener('click', toggleSidebar);
-            overlay.addEventListener('click', toggleSidebar);
-
-            // Search Suggestions
-            const searchInput = document.querySelector('.search-bar input');
-            const searchSuggestions = document.querySelector('.search-suggestions');
-
-            searchInput.addEventListener('focus', function() {
-                searchSuggestions.classList.add('active');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
-                    searchSuggestions.classList.remove('active');
-                }
-            });
-
-            // Add smooth scroll behavior
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            });
-        });
-    </script>
 </body>
 </html>
