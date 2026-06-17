@@ -1,124 +1,610 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile | Buy2Express</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>My Profile | Buy2Express</title>
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        *, *::before, *::after {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        :root {
+            --primary:        #F5A623;
+            --primary-dark:   #E09518;
+            --primary-light:  #FFC85A;
+            --secondary:      #1A1D2E;
+            --secondary-soft: #252840;
+            --accent:         #6C63FF;
+            --bg-page:        #F5F4F0;
+            --bg-card:        #FFFFFF;
+            --text-dark:      #1A1D2E;
+            --text-muted:     #7B7E92;
+            --border:         #E8E7E2;
+            --shadow-sm:      0 2px 8px rgba(26,29,46,0.08);
+            --shadow-md:      0 6px 20px rgba(26,29,46,0.12);
+            --shadow-lg:      0 16px 40px rgba(26,29,46,0.16);
+            --transition:     all 0.3s cubic-bezier(0.4,0,0.2,1);
+            --transition-fast:all 0.15s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        html { scroll-behavior: smooth; }
+
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #f3f4f6, #ffffff);
-            padding: 24px;
-        }
-        .wrap {
-            max-width: 760px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-        .header {
-            padding: 28px 32px;
-            background: linear-gradient(135deg, #ff4747, #ff7676);
-            color: #fff;
-        }
-        .header h1 { font-size: 28px; margin-bottom: 8px; }
-        .header p { opacity: 0.9; }
-        .body { padding: 32px; }
-        .messages { margin-bottom: 20px; }
-        .msg {
-            padding: 11px 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        .msg.error { background: #fff0f0; color: #d63031; }
-        .msg.success { background: #f0fff4; color: #00b894; }
-        .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-        .field { display: flex; flex-direction: column; gap: 8px; }
-        .field.full { grid-column: 1 / -1; }
-        label { font-size: 13px; color: #555; font-weight: 600; }
-        input, textarea {
-            width: 100%;
-            padding: 13px 14px;
-            border: 2px solid #ececec;
-            border-radius: 12px;
-            font-size: 15px;
-            outline: none;
-        }
-        input:focus, textarea:focus { border-color: #ff4747; box-shadow: 0 0 0 4px rgba(255,71,71,0.08); }
-        .actions { margin-top: 22px; display: flex; gap: 12px; }
-        .btn {
-            display: inline-flex;
+            background: var(--bg-page);
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            border: none;
-            border-radius: 12px;
-            padding: 13px 18px;
+            padding: 40px 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::before {
+            width: 520px; height: 520px;
+            top: -160px; right: -160px;
+            background: radial-gradient(circle, rgba(245,166,35,0.10) 0%, transparent 70%);
+        }
+        body::after {
+            width: 400px; height: 400px;
+            bottom: -120px; left: -120px;
+            background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 70%);
+        }
+
+        .card {
+            width: 100%;
+            max-width: 900px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: cardUp 0.55s cubic-bezier(0.34,1.2,0.64,1) both;
+            border: 1px solid var(--border);
+        }
+        @keyframes cardUp {
+            from { opacity: 0; transform: translateY(32px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+
+        .card-header {
+            background: var(--secondary);
+            padding: 30px 32px 26px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+            background-size: 200%;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            from { background-position: 200% center; }
+            to   { background-position: -200% center; }
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 6px;
             text-decoration: none;
+        }
+        .logo span { color: var(--primary); }
+        .logo i {
+            color: var(--primary);
+            font-size: 22px;
+            animation: iconBounce 2.5s ease-in-out infinite;
+        }
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-4px); }
+        }
+        .card-header p {
+            color: rgba(255,255,255,0.65);
+            font-size: 14px;
+        }
+
+        .card-body { padding: 36px 40px 40px; }
+
+        /* Messages */
+        .messages { margin-bottom: 22px; }
+        .msg {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: msgPop 0.35s ease both;
+        }
+        @keyframes msgPop {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .msg.error   { background: #fff5f5; color: #c0392b; border-left: 3px solid #c0392b; }
+        .msg.success { background: #f0fff8; color: #00875a; border-left: 3px solid #00875a; }
+
+        /* ===== Profile layout ===== */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 36px;
+            align-items: start;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding-top: 4px;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            width: 132px;
+            height: 132px;
+            margin-bottom: 18px;
+        }
+        .avatar-circle {
+            width: 132px;
+            height: 132px;
+            border-radius: 50%;
+            background: var(--bg-page);
+            border: 3px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .avatar-wrap:hover .avatar-circle {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 6px rgba(245,166,35,0.10);
+        }
+        .avatar-circle i {
+            font-size: 46px;
+            color: var(--text-muted);
+        }
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-edit {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            border: 3px solid var(--bg-card);
+            transition: var(--transition-fast);
+        }
+        .avatar-edit:hover {
+            background: var(--primary);
+            color: var(--secondary);
+            transform: scale(1.08);
+        }
+        .avatar-input {
+            position: absolute;
+            width: 1px; height: 1px;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .info-username {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+        .info-email {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            word-break: break-word;
+        }
+        .info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(108,99,255,0.08);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 999px;
+            letter-spacing: 0.2px;
+        }
+
+        .divider-v {
+            display: none;
+        }
+
+        /* Form column */
+        .form-col {
+            border-left: 1px solid var(--border);
+            padding-left: 36px;
+        }
+        .form-col h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .form-col .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 22px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 18px;
+        }
+        .field { margin-bottom: 0; }
+        .field.full { grid-column: 1 / -1; }
+        .field label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 7px;
+            letter-spacing: 0.2px;
+        }
+
+        .input-wrap { position: relative; }
+        .input-wrap input,
+        .input-wrap textarea,
+        .input-wrap select {
+            width: 100%;
+            padding: 13px 46px 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            color: var(--text-dark);
+            background: var(--bg-page);
+            outline: none;
+            transition: var(--transition);
+            resize: vertical;
+            min-height: 48px;
+        }
+        .input-wrap textarea { padding-top: 13px; min-height: 88px; }
+        .input-wrap input::placeholder,
+        .input-wrap textarea::placeholder { color: var(--text-muted); font-size: 14px; }
+        .input-wrap input:focus,
+        .input-wrap textarea:focus,
+        .input-wrap select:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(245,166,35,0.12);
+        }
+        .input-wrap input.is-readonly,
+        .input-wrap textarea.is-readonly {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        .input-wrap .icon {
+            position: absolute;
+            right: 15px;
+            top: 25px;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 15px;
+            pointer-events: none;
+            transition: var(--transition-fast);
+        }
+        .input-wrap textarea ~ .icon { top: 22px; }
+        .input-wrap input:focus ~ .icon,
+        .input-wrap textarea:focus ~ .icon { color: var(--primary); }
+
+        .checkbox-field {
+            margin-top: -4px;
+        }
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            color: var(--text-muted);
             cursor: pointer;
             font-weight: 600;
         }
-        .btn.primary { background: linear-gradient(135deg, #ff4747, #ff7676); color: #fff; }
-        .btn.secondary { background: #f3f4f6; color: #222; }
-        @media (max-width: 640px) {
-            body { padding: 12px; }
-            .body, .header { padding-left: 20px; padding-right: 20px; }
+        .checkbox-label input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .form-row-spaced { margin-top: 22px; }
+
+        /* Submit / actions */
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+        .btn-submit {
+            flex: 1;
+            padding: 14px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .btn-submit:hover::after { opacity: 1; }
+        .btn-submit span, .btn-submit i { position: relative; z-index: 1; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,166,35,0.35); }
+        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 14px;
+            background: var(--bg-page);
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        @media (max-width: 720px) {
+            .card-body { padding: 28px 22px 32px; }
+            .profile-grid { grid-template-columns: 1fr; }
+            .form-col { border-left: none; padding-left: 0; padding-top: 28px; border-top: 1px solid var(--border); margin-top: 10px; }
             .grid { grid-template-columns: 1fr; }
             .actions { flex-direction: column; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.1ms !important; }
         }
     </style>
 </head>
 <body>
-    <div class="wrap">
-        <div class="header">
-            <h1>My Profile</h1>
-            <p>Update your account and shipping details.</p>
-        </div>
-        <div class="body">
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="msg {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
 
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="grid">
-                    <div class="field">
-                        <label for="id_profile_image">Profile image</label>
-                        {{ form.profile_image }}
-                    </div>
-                    <div class="field">
-                        <label for="id_contact_number">Contact number</label>
-                        {{ form.contact_number }}
-                    </div>
-                    <div class="field full">
-                        <label for="id_shipping_address">Shipping address</label>
-                        {{ form.shipping_address }}
-                    </div>
-                    <div class="field full">
-                        <label for="id_billing_address">Billing address</label>
-                        {{ form.billing_address }}
-                    </div>
-                    <div class="field">
-                        <label for="id_date_of_birth">Date of birth</label>
-                        {{ form.date_of_birth }}
-                    </div>
-                </div>
-
-                <div class="actions">
-                    <button class="btn primary" type="submit"><i class="fas fa-save"></i> Save changes</button>
-                    <a class="btn secondary" href="{% url 'home' %}">Back to home</a>
-                </div>
-            </form>
-        </div>
+<div class="card">
+    <div class="card-header">
+        <a href="{% url 'home' %}" class="logo">
+            <i class="fas fa-shopping-bag"></i>
+            Buy2<span>Express</span>
+        </a>
+        <p>Manage your account and shipping details</p>
     </div>
+
+    <div class="card-body">
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="msg {{ message.tags }}">
+                <i class="fas fa-circle-info"></i> {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="messages">
+            {% for field in form %}
+                {% for error in field.errors %}
+                <div class="msg error">
+                    <i class="fas fa-exclamation-circle"></i> {{ field.label }}: {{ error }}
+                </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+            <div class="msg error">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" id="profileForm">
+            {% csrf_token %}
+
+            <div class="profile-grid">
+
+                <div class="sidebar">
+                    <div class="avatar-wrap">
+                        <div class="avatar-circle" id="avatarCircle">
+                            <i class="fas fa-user" id="avatarIcon"></i>
+                            <img id="avatarImg" alt="Profile photo" style="display:none;">
+                        </div>
+                        <label for="id_profile_image" class="avatar-edit" title="Change photo">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <div class="avatar-input">{{ form.profile_image }}</div>
+                    </div>
+
+                    <div class="info-username">{{ user.username|default:"Your account" }}</div>
+                    <div class="info-email">{{ user.email|default:"" }}</div>
+                    <span class="info-badge"><i class="fas fa-shield-halved"></i> Buy2Express member</span>
+                </div>
+
+                <div class="form-col">
+                    <h2>Personal &amp; shipping details</h2>
+                    <p class="subtitle">Keep this up to date so orders reach you without a hitch.</p>
+
+                    <div class="grid">
+                        <div class="field full">
+                            <label for="id_contact_number">Contact number</label>
+                            <div class="input-wrap">
+                                {{ form.contact_number }}
+                                <i class="fas fa-phone icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="field full">
+                            <label for="id_shipping_address">Shipping address</label>
+                            <div class="input-wrap">
+                                {{ form.shipping_address }}
+                                <i class="fas fa-location-dot icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="field full">
+                            <label for="id_billing_address">Billing address</label>
+                            <div class="input-wrap">
+                                {{ form.billing_address }}
+                                <i class="fas fa-file-invoice icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="field full checkbox-field">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="sameAsShipping">
+                                Billing address is the same as shipping
+                            </label>
+                        </div>
+
+                        <div class="field">
+                            <label for="id_date_of_birth">Date of birth</label>
+                            <div class="input-wrap">
+                                {{ form.date_of_birth }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn-submit" type="submit" id="submitBtn">
+                            <i class="fas fa-floppy-disk"></i><span>Save changes</span>
+                        </button>
+                        <a class="btn-secondary" href="{% url 'home' %}">
+                            <i class="fas fa-arrow-left"></i> Back to home
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    // Live avatar preview
+    (function () {
+        var fileInput = document.getElementById('id_profile_image');
+        var avatarImg = document.getElementById('avatarImg');
+        var avatarIcon = document.getElementById('avatarIcon');
+        if (!fileInput || !avatarImg || !avatarIcon) return;
+
+        fileInput.addEventListener('change', function () {
+            var file = this.files && this.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                avatarImg.src = e.target.result;
+                avatarImg.style.display = 'block';
+                avatarIcon.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+    })();
+
+    // "Billing same as shipping" convenience toggle
+    (function () {
+        var sameChk = document.getElementById('sameAsShipping');
+        var shipping = document.getElementById('id_shipping_address');
+        var billing = document.getElementById('id_billing_address');
+        if (!sameChk || !shipping || !billing) return;
+
+        sameChk.addEventListener('change', function () {
+            if (this.checked) {
+                billing.value = shipping.value;
+                billing.setAttribute('readonly', 'readonly');
+                billing.classList.add('is-readonly');
+            } else {
+                billing.removeAttribute('readonly');
+                billing.classList.remove('is-readonly');
+            }
+        });
+
+        shipping.addEventListener('input', function () {
+            if (sameChk.checked) billing.value = shipping.value;
+        });
+    })();
+
+    // Submit feedback
+    document.getElementById('profileForm').addEventListener('submit', function () {
+        var btn = document.getElementById('submitBtn');
+        btn.querySelector('span').textContent = 'Saving…';
+        btn.disabled = true;
+    });
+</script>
+
 </body>
 </html>
