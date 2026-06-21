@@ -1,108 +1,535 @@
 {% extends 'base.html' %}
-{% block title %}Product Form | Buy2Express{% endblock %}
-{% block content %}
+{% block title %}{% if form.instance.pk %}Edit Product{% else %}Add Product{% endif %} | Buy2Express{% endblock %}
+
+{% block extra_css %}
 <style>
-    .shell {
-        max-width: 980px;
+    /* ── Shell ── */
+    .pf-shell {
+        max-width: 1000px;
         margin: 0 auto;
-        padding: 32px 20px 0;
+        padding: 36px 24px 60px;
     }
-    .panel {
-        background: white;
-        border-radius: 24px;
-        box-shadow: 0 14px 35px rgba(0,0,0,0.08);
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 28px;
+        animation: pageIn 0.4s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .breadcrumb a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: var(--transition-fast);
+    }
+    .breadcrumb a:hover { color: var(--primary); }
+    .breadcrumb .sep { opacity: 0.4; }
+    .breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+    /* ── Panel ── */
+    .pf-panel {
+        background: var(--bg-card);
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        animation: panelRise 0.5s cubic-bezier(0.4,0,0.2,1) 0.05s both;
+    }
+    @keyframes panelRise {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Panel Header ── */
+    .pf-header {
+        background: var(--secondary);
+        padding: 32px 36px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: relative;
         overflow: hidden;
     }
-    .panel-header {
-        padding: 28px 32px;
-        background: linear-gradient(135deg, #ff4747, #ff7676);
+    .pf-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--primary));
+        background-size: 200%;
+        animation: shimmerBar 3s linear infinite;
+    }
+    .pf-header-icon {
+        width: 52px;
+        height: 52px;
+        background: rgba(245,166,35,0.15);
+        border: 1px solid rgba(245,166,35,0.3);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .pf-header-icon i { font-size: 24px; color: var(--primary); }
+    .pf-header-text h1 {
         color: white;
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        letter-spacing: -0.3px;
     }
-    .panel-header h1 { font-size: 32px; margin-bottom: 8px; }
-    .panel-body { padding: 32px; }
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-    }
-    .field { display: flex; flex-direction: column; gap: 8px; }
-    .field.full { grid-column: 1 / -1; }
-    label { font-size: 13px; color: #555; font-weight: 700; }
-    input, select, textarea {
-        width: 100%;
-        padding: 13px 14px;
-        border: 1px solid #e8e8e8;
-        border-radius: 12px;
-        outline: none;
-        background: #fff;
-    }
-    textarea { min-height: 140px; resize: vertical; }
-    .errors { margin-bottom: 18px; }
-    .error {
-        background: #fff0f0;
-        color: #d63031;
-        border-left: 3px solid #d63031;
-        padding: 12px 14px;
-        border-radius: 10px;
-        margin-bottom: 8px;
+    .pf-header-text p {
+        color: rgba(255,255,255,0.55);
         font-size: 14px;
     }
-    .actions { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
-    .btn {
+
+    /* ── Panel Body ── */
+    .pf-body { padding: 36px; }
+
+    /* ── Error Block ── */
+    .pf-errors {
+        background: #FFF5F5;
+        border: 1px solid #FFCDD2;
+        border-left: 4px solid #E53E3E;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 28px;
+        animation: shakeIn 0.4s cubic-bezier(0.36,0.07,0.19,0.97) both;
+    }
+    @keyframes shakeIn {
+        0%,100% { transform: translateX(0); }
+        20%      { transform: translateX(-6px); }
+        40%      { transform: translateX(6px); }
+        60%      { transform: translateX(-4px); }
+        80%      { transform: translateX(4px); }
+    }
+    .pf-errors-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        color: #C53030;
+        margin-bottom: 10px;
+    }
+    .pf-error-item {
+        font-size: 13px;
+        color: #C53030;
+        padding: 4px 0 4px 20px;
+        position: relative;
+    }
+    .pf-error-item::before {
+        content: '›';
+        position: absolute;
+        left: 6px;
+        color: #FC8181;
+    }
+
+    /* ── Form Grid ── */
+    .pf-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+    }
+
+    /* ── Field ── */
+    .pf-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        animation: fieldFadeIn 0.4s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .pf-field:nth-child(1)  { animation-delay: 0.07s; }
+    .pf-field:nth-child(2)  { animation-delay: 0.10s; }
+    .pf-field:nth-child(3)  { animation-delay: 0.13s; }
+    .pf-field:nth-child(4)  { animation-delay: 0.16s; }
+    .pf-field:nth-child(5)  { animation-delay: 0.19s; }
+    .pf-field:nth-child(6)  { animation-delay: 0.22s; }
+    .pf-field:nth-child(7)  { animation-delay: 0.25s; }
+    .pf-field:nth-child(8)  { animation-delay: 0.28s; }
+    @keyframes fieldFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .pf-field.full { grid-column: 1 / -1; }
+
+    .pf-field label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+    .pf-field label .required {
+        color: var(--primary);
+        margin-left: 2px;
+    }
+
+    /* ── Input overrides ── */
+    .pf-field input,
+    .pf-field select,
+    .pf-field textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        background: #FAFAF8;
+        color: var(--text-dark);
+        font-size: 14px;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        transition: var(--transition);
+        outline: none;
+        -webkit-appearance: none;
+    }
+    .pf-field input:hover,
+    .pf-field select:hover,
+    .pf-field textarea:hover {
+        border-color: #C8C7C2;
+        background: white;
+    }
+    .pf-field input:focus,
+    .pf-field select:focus,
+    .pf-field textarea:focus {
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(245,166,35,0.12);
+    }
+    .pf-field textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
+
+    .pf-field .field-error {
+        font-size: 12px;
+        color: #E53E3E;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .pf-field .field-error::before { content: '⚠'; font-size: 11px; }
+
+    /* ── Divider ── */
+    .pf-divider {
+        grid-column: 1 / -1;
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 6px 0;
+    }
+
+    /* ── Section label ── */
+    .pf-section-label {
+        grid-column: 1 / -1;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        padding-bottom: 4px;
+        border-bottom: 2px solid var(--primary);
+        display: inline-block;
+        margin-bottom: -8px;
+    }
+
+    /* ── Actions ── */
+    .pf-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        flex-wrap: wrap;
+    }
+
+    .pf-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
         border: none;
-        border-radius: 12px;
-        padding: 13px 18px;
-        text-decoration: none;
+        border-radius: 10px;
+        padding: 13px 24px;
+        font-size: 14px;
         font-weight: 700;
+        font-family: 'Segoe UI', Arial, sans-serif;
         cursor: pointer;
+        text-decoration: none;
+        transition: var(--transition-fast);
+        position: relative;
+        overflow: hidden;
     }
-    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; }
-    .btn-soft { background: #f3f4f6; color: #222; }
-    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } .panel-body, .panel-header { padding-left: 20px; padding-right: 20px; } }
+    .pf-btn::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,0.12);
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+    .pf-btn:hover::after { opacity: 1; }
+    .pf-btn:active { transform: scale(0.97); }
+
+    .pf-btn-save {
+        background: var(--secondary);
+        color: white;
+        box-shadow: 0 4px 14px rgba(26,29,46,0.25);
+        min-width: 160px;
+    }
+    .pf-btn-save:hover {
+        background: var(--primary);
+        color: var(--secondary);
+        box-shadow: 0 4px 18px rgba(245,166,35,0.35);
+        transform: translateY(-1px);
+    }
+
+    .pf-btn-cancel {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1.5px solid var(--border);
+    }
+    .pf-btn-cancel:hover {
+        border-color: var(--text-muted);
+        color: var(--text-dark);
+        background: #F5F4F0;
+    }
+
+    .pf-btn-icon { font-size: 16px; }
+
+    .pf-saving-hint {
+        margin-left: auto;
+        font-size: 13px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .pf-saving-hint i { color: var(--primary); }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+        .pf-header { padding: 24px 20px; }
+        .pf-body { padding: 24px 20px; }
+        .pf-grid { grid-template-columns: 1fr; }
+        .pf-header-icon { display: none; }
+    }
 </style>
-<div class="shell">
-    <div class="panel">
-        <div class="panel-header">
-            <h1>Product</h1>
-            <p>Create or update catalog items using the shared Buy2Express style.</p>
+{% endblock %}
+
+{% block content %}
+<div class="pf-shell">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'home' %}"><i class="fas fa-home"></i></a>
+        <span class="sep">›</span>
+        <a href="{% url 'product_management:products' %}">Products</a>
+        <span class="sep">›</span>
+        <span class="current">{% if form.instance.pk %}Edit: {{ form.instance.name }}{% else %}Add Product{% endif %}</span>
+    </nav>
+
+    <div class="pf-panel">
+
+        <!-- Header -->
+        <div class="pf-header">
+            <div class="pf-header-icon">
+                <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus-circle{% endif %}" aria-hidden="true"></i>
+            </div>
+            <div class="pf-header-text">
+                <h1>{% if form.instance.pk %}Edit Product{% else %}New Product{% endif %}</h1>
+                <p>{% if form.instance.pk %}Update this catalog item's details below.{% else %}Fill in the details to add a new item to the catalog.{% endif %}</p>
+            </div>
         </div>
-        <div class="panel-body">
-            {% if form.errors %}
-            <div class="errors">
+
+        <!-- Body -->
+        <div class="pf-body">
+
+            <!-- Errors -->
+            {% if form.errors or formset.errors %}
+            <div class="pf-errors" role="alert">
+                <div class="pf-errors-title">
+                    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                    Please fix the following errors
+                </div>
+
                 {% for field in form %}
                     {% for error in field.errors %}
-                    <div class="error">{{ field.label }}: {{ error }}</div>
+                    <div class="pf-error-item">{{ field.label }}: {{ error }}</div>
                     {% endfor %}
                 {% endfor %}
+
                 {% for error in form.non_field_errors %}
-                <div class="error">{{ error }}</div>
+                <div class="pf-error-item">{{ error }}</div>
+                {% endfor %}
+
+                {% for image_form in formset %}
+                    {% for field in image_form %}
+                        {% for error in field.errors %}
+                        <div class="pf-error-item">{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
                 {% endfor %}
             </div>
             {% endif %}
 
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" novalidate id="productForm">
                 {% csrf_token %}
-                <div class="grid">
+
+                <!-- Product Fields -->
+                <div class="pf-grid">
                     {% for field in form %}
-                        <div class="field {% if field.name == 'description' %}full{% endif %} {% if field.name == 'seller' or field.name == 'description' %}full{% endif %}">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% for error in field.errors %}
-                            <div class="error">{{ error }}</div>
-                            {% endfor %}
-                        </div>
+                    <div class="pf-field {% if field.name == 'description' or field.name == 'seller' %}full{% endif %}">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}
+                                <span class="required" aria-hidden="true">*</span>
+                            {% endif %}
+                        </label>
+
+                        {{ field }}
+
+                        {% for error in field.errors %}
+                        <span class="field-error" role="alert">{{ error }}</span>
+                        {% endfor %}
+                    </div>
                     {% endfor %}
                 </div>
-                <div class="actions">
-                    <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Save Product</button>
-                    <a class="btn btn-soft" href="{% url 'product_management:products' %}">Cancel</a>
+
+                <!-- Product Images Section -->
+                <div class="pf-section-label" style="margin-top:28px;">
+                    Product Images
                 </div>
+
+                {{ formset.management_form }}
+
+                <div class="pf-grid" id="imageFormsetContainer" style="margin-top:14px;">
+                    {% for img_form in formset %}
+                    <div class="pf-field image-form-row">
+
+                        {{ img_form.id }}
+
+                        <label>Image {{ forloop.counter }}</label>
+
+                        {{ img_form.image }}
+
+                        {% if img_form.instance.pk and img_form.instance.image %}
+                        <div style="margin-top:10px;">
+                            <img src="{{ img_form.instance.image.url }}"
+                                 alt="Product Image"
+                                 style="max-width:120px;border-radius:8px;border:1px solid #ddd;">
+                        </div>
+
+                        <label style="display:block;margin-top:10px;font-size:13px;">
+                            {{ img_form.DELETE }} Delete this image
+                        </label>
+                        {% endif %}
+
+                        {% for error in img_form.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" id="addImageBtn" class="pf-btn pf-btn-cancel" style="margin-top:14px;">
+                    <i class="fas fa-plus pf-btn-icon"></i> Add another image
+                </button>
+
+                <!-- Hidden empty template for cloning new image rows -->
+                <template id="emptyImageFormTemplate">
+                    <div class="pf-field image-form-row">
+                        <label>Image</label>
+                        {{ formset.empty_form.image }}
+                        {% for error in formset.empty_form.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </template>
+
+                <!-- Action Buttons -->
+                <div class="pf-actions">
+                    <button class="pf-btn pf-btn-save" type="submit" id="saveBtn">
+                        <i class="fas fa-save pf-btn-icon" aria-hidden="true"></i>
+                        {% if form.instance.pk %}
+                            Update Product
+                        {% else %}
+                            Save Product
+                        {% endif %}
+                    </button>
+
+                    <a class="pf-btn pf-btn-cancel"
+                       href="{% url 'product_management:products' %}">
+                        <i class="fas fa-times pf-btn-icon" aria-hidden="true"></i>
+                        Cancel
+                    </a>
+
+                    <span class="pf-saving-hint">
+                        <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                        Changes are saved immediately
+                    </span>
+                </div>
+
             </form>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    /* Focus ring color on inputs */
+    document.querySelectorAll('.pf-field input, .pf-field select, .pf-field textarea').forEach(el => {
+        el.addEventListener('focus', () => el.closest('.pf-field').querySelector('label')?.style.setProperty('color', 'var(--primary)'));
+        el.addEventListener('blur',  () => el.closest('.pf-field').querySelector('label')?.style.removeProperty('color'));
+    });
+
+    /* Save button loading state */
+    const saveBtn = document.getElementById('saveBtn');
+    const form = document.getElementById('productForm');
+    if (form && saveBtn) {
+        form.addEventListener('submit', () => {
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+            saveBtn.disabled = true;
+        });
+    }
+})();
+
+/* Dynamic "Add another image" handling */
+(function () {
+    const addBtn = document.getElementById('addImageBtn');
+    const container = document.getElementById('imageFormsetContainer');
+    const template = document.getElementById('emptyImageFormTemplate');
+
+    if (!addBtn || !container || !template) return;
+
+    // Find the TOTAL_FORMS hidden input regardless of formset prefix
+    const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
+
+    if (!totalFormsInput) {
+        console.error('Could not find TOTAL_FORMS input — check formset.management_form is rendered.');
+        return;
+    }
+
+    // Extract prefix from the input's name, e.g. "images-TOTAL_FORMS" -> "images"
+    const prefixMatch = totalFormsInput.name.match(/^(.*)-TOTAL_FORMS$/);
+    const prefix = prefixMatch ? prefixMatch[1] : 'form';
+
+    addBtn.addEventListener('click', function () {
+        const formIndex = parseInt(totalFormsInput.value, 10);
+
+        // Replace Django's __prefix__ placeholder with the real form prefix + index
+        const newRowHtml = template.innerHTML.replace(
+            /__prefix__/g,
+            `${formIndex}`
+        );
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = newRowHtml.trim();
+        container.appendChild(wrapper.firstElementChild);
+
+        totalFormsInput.value = formIndex + 1;
+    });
+})();
+</script>
 {% endblock %}

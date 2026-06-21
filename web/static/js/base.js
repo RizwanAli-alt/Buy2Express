@@ -175,15 +175,40 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ── Header scroll shadow ──────────────────────────────────
-    const header = document.querySelector('header');
-    if (header) {
-        window.addEventListener('scroll', function () {
-            header.style.boxShadow = window.scrollY > 10
-                ? '0 4px 30px rgba(0,0,0,0.35)'
-                : '0 2px 20px rgba(0,0,0,0.25)';
-        }, { passive: true });
+    // ── Header scroll shadow + auto-hide on scroll ────────────
+const header = document.querySelector('header');
+if (header) {
+    let lastScrollY = window.scrollY;
+    let headerTicking = false;
+    const hideThreshold = 80; // header sirf itna scroll hone ke baad hide hoga
+
+    function handleHeaderScroll() {
+        const currentScrollY = window.scrollY;
+
+        // Shadow intensity based on scroll position
+        header.style.boxShadow = currentScrollY > 10
+            ? '0 4px 30px rgba(0,0,0,0.35)'
+            : '0 2px 20px rgba(0,0,0,0.25)';
+
+        if (currentScrollY > lastScrollY && currentScrollY > hideThreshold) {
+            // Scrolling down -> hide header
+            header.classList.add('header-hidden');
+        } else if (currentScrollY < lastScrollY) {
+            // Scrolling up -> show header
+            header.classList.remove('header-hidden');
+        }
+
+        lastScrollY = currentScrollY;
+        headerTicking = false;
     }
+
+    window.addEventListener('scroll', function () {
+        if (!headerTicking) {
+            requestAnimationFrame(handleHeaderScroll);
+            headerTicking = true;
+        }
+    }, { passive: true });
+}
 
     // ── Nav active link ───────────────────────────────────────
     const currentPath = window.location.pathname;

@@ -14,10 +14,9 @@ def cart_view(request):
 
 @login_required
 def add_to_cart(request, product_id):
-    """Add a product to the user's cart."""
     cart, created = Cart.objects.get_or_create(user=request.user)
     product = get_object_or_404(Product, pk=product_id)
-    
+
     if request.method == 'POST':
         form = CartItemForm(request.POST)
         if form.is_valid():
@@ -26,20 +25,26 @@ def add_to_cart(request, product_id):
             cart_item.product = product
             cart_item.save()
             messages.success(request, f"{product.name} added to cart.")
+            if request.POST.get('next') == 'checkout':
+                return redirect('cart_and_orders:checkout')
             return redirect('cart_and_orders:cart_view')
         else:
             messages.error(request, "Error adding product to cart.")
+            return redirect('product_management:product_detail', slug=product.slug)
     else:
         form = CartItemForm()
-    
+
     return render(request, 'cart_and_orders/add_to_cart.html', {'form': form, 'product': product})
 
 @login_required
 def checkout(request):
-    """Checkout the current user's cart."""
     cart = get_object_or_404(Cart, user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
-    
+
+    if not cart_items.exists():
+        messages.error(request, "Your cart is empty.")
+        return redirect('cart_and_orders:cart_view')
+
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
@@ -47,8 +52,7 @@ def checkout(request):
             order.user = request.user
             order.total_price = sum(item.product.price * item.quantity for item in cart_items)
             order.save()
-            
-            # Save order items
+
             for item in cart_items:
                 order.items.create(
                     product=item.product,
@@ -56,17 +60,28 @@ def checkout(request):
                     quantity=item.quantity,
                     price=item.product.price
                 )
-            # Clear the cart
             cart.clear()
-            messages.success(request, "Order placed successfully.")
-            return redirect('cart_and_orders:order_success')
+            messages.success(request, "Order placed. Now complete your payment.")
+            return redirect('payments:payment_process', order_id=order.id)   # ← was order_success
         else:
             messages.error(request, "Error processing your order.")
     else:
         form = OrderForm()
-    
+
     return render(request, 'cart_and_orders/checkout.html', {'form': form, 'cart': cart, 'cart_items': cart_items})
 
+
+@login_required
+def remove_from_cart(request, item_id):
+    cart = get_object_or_404(Cart, user=request.user)
+    item = get_object_or_404(CartItem, pk=item_id, cart=cart)
+    if request.method == 'POST':
+        item.delete()
+        messages.success(request, "Item removed from cart.")
+    return redirect('cart_and_orders:cart_view')
+
+
+    
 @login_required
 def order_success(request):
     """Display the order success page."""

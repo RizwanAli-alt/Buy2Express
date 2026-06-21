@@ -1,14 +1,27 @@
-
 from django import forms
-from .models import Product, Category, Brand, ProductImage, ProductSpecification, ProductVariant
+from django.forms import inlineformset_factory
+from .models import (
+    Product,
+    Category,
+    Brand,
+    ProductImage,
+    ProductSpecification,
+    ProductVariant
+)
 
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'slug', 'category', 'brand', 'seller', 'description', 'price', 'discount_price', 'stock', 'is_active', 'is_featured']
+        fields = [
+            'name', 'slug', 'category', 'brand', 'seller',
+            'description', 'price', 'discount_price',
+            'stock', 'is_active', 'is_featured'
+        ]
         widgets = {
-            'slug': forms.TextInput(attrs={'placeholder': 'Auto-generated from name if left blank'}),
+            'slug': forms.TextInput(
+                attrs={'placeholder': 'Auto-generated from name if left blank'}
+            ),
         }
 
 
@@ -29,7 +42,9 @@ class ProductVariantForm(forms.ModelForm):
         model = ProductVariant
         fields = ['product', 'name', 'options']
         widgets = {
-            'options': forms.TextInput(attrs={'placeholder': 'Comma-separated values, e.g., S,M,L'}),
+            'options': forms.TextInput(
+                attrs={'placeholder': 'Comma-separated values, e.g., S,M,L'}
+            ),
         }
 
 
@@ -38,8 +53,14 @@ class CategoryForm(forms.ModelForm):
         model = Category
         fields = ['name', 'slug', 'parent_category', 'description', 'image']
         widgets = {
-            'slug': forms.TextInput(attrs={'placeholder': 'Auto-generated from name if left blank'}),
+            'slug': forms.TextInput(
+                attrs={'placeholder': 'Auto-generated from name if left blank'}
+            ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['image'].required = True
 
 
 class BrandForm(forms.ModelForm):
@@ -47,3 +68,16 @@ class BrandForm(forms.ModelForm):
         model = Brand
         fields = ['name', 'logo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['logo'].required = True
+
+
+# Multiple Product Images FormSet
+ProductImageFormSet = inlineformset_factory(
+    Product,
+    ProductImage,
+    fields=['image'],
+    extra=1,          # 1 image upload field by default
+    can_delete=True
+)

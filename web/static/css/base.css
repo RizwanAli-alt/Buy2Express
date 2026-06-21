@@ -8,7 +8,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 :root {
@@ -36,19 +35,58 @@
 html { scroll-behavior: smooth; }
 
 body {
+    font-family: 'Segoe UI', Arial, sans-serif;
     background: var(--bg-page);
     color: var(--text-dark);
     overflow-x: hidden;
+    padding-top: var(--header-height);
+}
+
+/* ---------- Font Awesome Fix -------------------------------
+   Global * selector above no longer forces font-family, but we
+   explicitly pin FA icon classes here just to be 100% safe. */
+.fa,
+.fas,
+.far,
+.fal,
+.fad,
+.fab,
+.fa-solid,
+.fa-regular,
+.fa-light,
+.fa-duotone,
+.fa-brands {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900;
+}
+
+.far,
+.fa-regular {
+    font-weight: 400;
+}
+
+.fab,
+.fa-brands {
+    font-family: "Font Awesome 6 Brands" !important;
+    font-weight: 400;
 }
 
 /* ---------- Header ----------------------------------------- */
 header {
     background: var(--secondary);
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
     z-index: 1000;
     box-shadow: 0 2px 20px rgba(0,0,0,0.25);
     animation: headerSlideDown 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s ease;
+}
+
+header.header-hidden {
+    transform: translateY(-100%);
 }
 
 @keyframes headerSlideDown {

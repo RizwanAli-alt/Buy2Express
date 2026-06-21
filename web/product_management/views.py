@@ -2,8 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import Product, Category, Brand, ProductImage, ProductSpecification, ProductVariant
-from .forms import ProductForm, CategoryForm, BrandForm, ProductImageForm, ProductSpecificationForm, ProductVariantForm
-
+from .forms import (
+    ProductForm,
+    CategoryForm,
+    BrandForm,
+    ProductImageForm,
+    ProductSpecificationForm,
+    ProductVariantForm,
+    ProductImageFormSet
+)
+from django.db.models import Avg, Count
+from reviews.models import Review
 
 def product_list(request):
     query = request.GET.get('q')
@@ -34,27 +43,69 @@ def product_list(request):
     })
 
 
+def product_detail(request, slug):
+    product = get_object_or_404(
+        Product.objects.select_related('category', 'brand', 'seller'),
+        slug=slug, is_active=True
+    )
+    variants = product.variants.all()
+    images = product.images.all()
+    specifications = product.specifications.all()
+    related_products = Product.objects.filter(
+        category=product.category, is_active=True
+    ).exclude(pk=product.pk)[:4]
+
+    reviews = Review.objects.filter(product=product, is_approved=True).select_related('user').order_by('-created_at')
+    rating_data = reviews.aggregate(avg=Avg('rating'), total=Count('id'))
+    average_rating = round(rating_data['avg'] or 0, 1)
+    review_count = rating_data['total']
+    user_has_reviewed = (
+        request.user.is_authenticated and
+        Review.objects.filter(product=product, user=request.user).exists()
+    )
+
+    return render(request, 'product_management/product_detail.html', {
+        'product': product, 'variants': variants, 'images': images,
+        'specifications': specifications, 'related_products': related_products,
+        'reviews': reviews[:5], 'review_count': review_count,
+        'average_rating': average_rating, 'user_has_reviewed': user_has_reviewed,
+    })
+
+
 def product_create(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
+        formset = ProductImageFormSet(request.POST, request.FILES)
+
+        if form.is_valid() and formset.is_valid():
+            product = form.save()
+            formset.instance = product
+            formset.save()
             return redirect('product_management:products')
+        # agar invalid hai to form/formset errors ke saath wapis render hoga
     else:
         form = ProductForm()
-    return render(request, 'product_management/product_form.html', {'form': form})
+        formset = ProductImageFormSet()
+
+    return render(request, 'product_management/product_form.html', {'form': form, 'formset': formset})
 
 
 def product_update(request, pk):
     product = get_object_or_404(Product, pk=pk)
+
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
+        formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
+
+        if form.is_valid() and formset.is_valid():
             form.save()
+            formset.save()
             return redirect('product_management:products')
     else:
         form = ProductForm(instance=product)
-    return render(request, 'product_management/product_form.html', {'form': form})
+        formset = ProductImageFormSet(instance=product)
+
+    return render(request, 'product_management/product_form.html', {'form': form, 'formset': formset})
 
 
 def product_delete(request, pk):

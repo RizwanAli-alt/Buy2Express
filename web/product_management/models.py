@@ -1,4 +1,8 @@
+from datetime import timedelta
+
 from django.db import models
+from django.utils import timezone  
+from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 
 CustomUser = get_user_model()
@@ -31,13 +35,32 @@ class Seller(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, unique=True)  # unique=True auto-indexes
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
-    brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, related_name="products")
-    seller = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="products")
+    slug = models.SlugField(max_length=255, unique=True)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name="products"
+    )
+    brand = models.ForeignKey(
+        'Brand',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="products"
+    )
+    seller = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="products"
+    )
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    discount_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
     stock = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
@@ -45,14 +68,53 @@ class Product(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['category']),              # ✅ browse by category
-            models.Index(fields=['seller']),                # ✅ seller's product listings
-            models.Index(fields=['is_active']),             # ✅ show only active products
-            models.Index(fields=['is_featured']),           # ✅ homepage featured section
-            models.Index(fields=['category', 'is_active']), # ✅ composite: active products in category
-            models.Index(fields=['price']),                 # ✅ price sorting/filtering
-            models.Index(fields=['-created_at']),           # ✅ newest first
+            models.Index(fields=['category']),
+            models.Index(fields=['seller']),
+            models.Index(fields=['is_active']),
+            models.Index(fields=['is_featured']),
+            models.Index(fields=['category', 'is_active']),
+            models.Index(fields=['price']),
+            models.Index(fields=['-created_at']),
         ]
+
+    def save(self, *args, **kwargs):
+        """
+        Auto-generate unique slug if not provided.
+        """
+        if not self.slug:
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+
+            while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        super().save(*args, **kwargs)
+
+    @property
+    def discount_percent(self):
+        """
+        Calculate discount percentage.
+        Example:
+        Original Price (discount_price) = 1000
+        Sale Price (price) = 800
+        Result = 20%
+        """
+        if self.discount_price and self.discount_price > self.price:
+            return round(
+                (1 - (self.price / self.discount_price)) * 100
+            )
+        return 0
+
+    @property
+    def is_new(self):
+        """
+        Product is considered new for 14 days after creation.
+        """
+        return self.created_at >= timezone.now() - timedelta(days=14)
 
     def __str__(self):
         return self.name

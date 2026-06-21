@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} | Buy2Express{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pd-shell { max-width: var(--max-width); margin: 0 auto; padding: 30px 24px 70px; }
+
+    .pd-breadcrumb {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 13px; color: var(--text-muted); margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .pd-breadcrumb a { color: var(--text-muted); text-decoration: none; transition: var(--transition-fast); }
+    .pd-breadcrumb a:hover { color: var(--primary); }
+    .pd-breadcrumb .sep { opacity: 0.4; }
+    .pd-breadcrumb .current { color: var(--text-dark); font-weight: 600; }
+
+    .pd-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+        gap: 40px;
+        align-items: start;
+    }
+
+    /* ── Gallery ── */
+    .pd-gallery-main {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow-sm);
+        height: 420px;
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+    .pd-gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+    .pd-gallery-main i { font-size: 64px; color: var(--border); }
+    .pd-badge {
+        position: absolute; top: 16px; left: 16px;
+        padding: 6px 12px; border-radius: 8px;
+        font-size: 12px; font-weight: 800; letter-spacing: 0.4px;
+        color: white; box-shadow: var(--shadow-sm); text-transform: uppercase;
+    }
+    .pd-badge-sale { background: #E24B4A; }
+    .pd-badge-featured { background: var(--primary); color: var(--secondary); }
+    .pd-badge-new { background: var(--secondary); }
+
+    .pd-thumbs { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .pd-thumb {
+        width: 70px; height: 70px; border-radius: 10px; overflow: hidden;
+        border: 2px solid var(--border); cursor: pointer; transition: var(--transition-fast);
+        background: var(--bg-card);
+    }
+    .pd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .pd-thumb.active, .pd-thumb:hover { border-color: var(--primary); }
+
+    /* ── Info column ── */
+    .pd-info h1 { font-size: 26px; font-weight: 800; color: var(--text-dark); margin-bottom: 10px; line-height: 1.3; }
+    .pd-meta { font-size: 13.5px; color: var(--text-muted); margin-bottom: 18px; }
+    .pd-meta a { color: var(--text-muted); text-decoration: none; }
+    .pd-meta a:hover { color: var(--primary); }
+
+    .pd-rating-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .pd-stars { color: #F5A623; font-size: 16px; letter-spacing: 2px; }
+    .pd-rating-value { font-weight: 700; color: var(--text-dark); font-size: 14px; }
+    .pd-review-count { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .pd-review-count:hover { color: var(--primary); text-decoration: underline; }
+
+    .pd-reviews-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .pd-reviewed-pill { background: #E8F8EE; color: #1E8E4F; font-weight: 700; font-size: 12.5px; padding: 7px 14px; border-radius: 8px; }
+    .pd-review-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .pd-review-item:last-child { border-bottom: none; }
+    .pd-review-stars { color: #F5A623; font-size: 13px; letter-spacing: 1.5px; margin-bottom: 4px; }
+    .pd-review-meta { font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px; }
+    .pd-review-item p { font-size: 13.5px; color: var(--text-dark); line-height: 1.6; }
+    .pd-review-img { max-width: 120px; border-radius: 10px; margin-top: 10px; display: block; }
+
+    .pd-price-row {
+        display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+        padding: 18px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+        margin-bottom: 18px;
+    }
+    .pd-price-current { font-size: 30px; font-weight: 800; color: var(--primary); }
+    .pd-price-original { font-size: 16px; color: var(--text-muted); text-decoration: line-through; }
+    .pd-off-pill {
+        background: #FFF3DC; color: var(--primary-dark); font-weight: 700; font-size: 12.5px;
+        padding: 4px 10px; border-radius: 8px;
+    }
+
+    .stock-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 8px; margin-bottom: 20px;
+    }
+    .stock-pill.in-stock { background: #E8F8EE; color: #1E8E4F; }
+    .stock-pill.out-stock { background: #FDEDEC; color: #C0392B; }
+
+    .pd-section-label {
+        font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+        color: var(--text-muted); margin-bottom: 10px; display: block;
+    }
+
+    .pd-variants { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+    .variant-pill { cursor: pointer; }
+    .variant-pill input { display: none; }
+    .variant-pill span {
+        display: inline-flex; align-items: center; padding: 9px 16px;
+        border: 1.5px solid var(--border); border-radius: 10px; font-size: 13.5px; font-weight: 600;
+        color: var(--text-dark); background: var(--bg-card); transition: var(--transition-fast);
+    }
+    .variant-pill input:checked + span {
+        border-color: var(--primary); background: #FFF8EC; color: var(--primary-dark);
+    }
+
+    .pd-qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; }
+    .qty-control { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .qty-btn {
+        width: 38px; height: 42px; border: none; background: var(--bg-card); cursor: pointer;
+        font-size: 18px; color: var(--text-dark); transition: var(--transition-fast);
+    }
+    .qty-btn:hover { background: #FFF8EC; color: var(--primary-dark); }
+    #qty-input {
+        width: 56px; height: 42px; border: none; border-left: 1.5px solid var(--border);
+        border-right: 1.5px solid var(--border); text-align: center; font-size: 15px; font-weight: 700;
+        color: var(--text-dark); -moz-appearance: textfield;
+    }
+    #qty-input::-webkit-outer-spin-button, #qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    .pd-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        border-radius: 10px; padding: 14px 22px; text-decoration: none; font-weight: 700;
+        font-size: 14.5px; border: none; cursor: pointer; transition: var(--transition-fast);
+        flex: 1; min-width: 160px;
+    }
+    .btn-primary { background: var(--primary); color: var(--secondary); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-soft { background: var(--bg-card); color: var(--text-dark); border: 1.5px solid var(--border); }
+    .btn-soft:hover { background: #f1efe9; border-color: var(--primary-light); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    /* ── Description / specs ── */
+    .pd-block {
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+        padding: 26px; margin-top: 32px; box-shadow: var(--shadow-sm);
+    }
+    .pd-block h2 { font-size: 17px; font-weight: 700; color: var(--text-dark); margin-bottom: 14px; }
+    .pd-block p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+    .pd-specs { width: 100%; border-collapse: collapse; }
+    .pd-specs tr { border-bottom: 1px solid var(--border); }
+    .pd-specs tr:last-child { border-bottom: none; }
+    .pd-specs td { padding: 10px 0; font-size: 13.5px; }
+    .pd-specs td:first-child { color: var(--text-muted); font-weight: 600; width: 40%; }
+    .pd-specs td:last-child { color: var(--text-dark); }
+
+    /* ── Related products ── */
+    .pd-related { margin-top: 44px; }
+    .pd-related h2 { font-size: 19px; font-weight: 700; color: var(--text-dark); margin-bottom: 18px; }
+    .pd-related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    .pd-rel-card {
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+        overflow: hidden; text-decoration: none; display: block; transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+    .pd-rel-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(245,166,35,0.4); }
+    .pd-rel-img { height: 140px; background: linear-gradient(135deg, #f5f4f0, #ffffff); display: flex; align-items: center; justify-content: center; }
+    .pd-rel-img img { width: 100%; height: 100%; object-fit: cover; }
+    .pd-rel-img i { font-size: 32px; color: var(--border); }
+    .pd-rel-body { padding: 14px 16px; }
+    .pd-rel-body h4 { font-size: 13.5px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+    .pd-rel-body .price { font-size: 15px; font-weight: 700; color: var(--primary); }
+
+    @media (max-width: 900px) {
+        .pd-layout { grid-template-columns: 1fr; }
+        .pd-gallery-main { height: 320px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pd-shell">
+    <nav class="pd-breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'home' %}">Home</a>
+        <span class="sep">›</span>
+        <a href="{% url 'product_management:products' %}">Products</a>
+        <span class="sep">›</span>
+        <a href="{% url 'product_management:products' %}?category={{ product.category.id }}">{{ product.category.name }}</a>
+        <span class="sep">›</span>
+        <span class="current">{{ product.name }}</span>
+    </nav>
+
+    <div class="pd-layout">
+        <!-- Gallery -->
+        <div>
+            <div class="pd-gallery-main">
+                {% if product.is_featured %}
+                    <span class="pd-badge pd-badge-featured">Featured</span>
+                {% elif product.discount_percent %}
+                    <span class="pd-badge pd-badge-sale">-{{ product.discount_percent }}%</span>
+                {% elif product.is_new %}
+                    <span class="pd-badge pd-badge-new">New</span>
+                {% endif %}
+
+                {% if images %}
+                    <img id="pdMainImage" src="{{ images.0.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <i class="fas fa-box-open" aria-hidden="true"></i>
+                {% endif %}
+            </div>
+
+            {% if images|length > 1 %}
+            <div class="pd-thumbs">
+                {% for img in images %}
+                <div class="pd-thumb {% if forloop.first %}active{% endif %}" data-src="{{ img.image.url }}">
+                    <img src="{{ img.image.url }}" alt="{{ product.name }}">
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="pd-info">
+            <h1>{{ product.name }}</h1>
+            <div class="pd-meta">
+                {{ product.category.name }}
+                {% if product.brand %} &middot; <a href="{% url 'product_management:products' %}?brand={{ product.brand.id }}">{{ product.brand.name }}</a>{% endif %}
+                &middot; Sold by {{ product.seller.get_full_name|default:product.seller }}
+            </div>
+
+            <div class="pd-rating-row">
+                <span class="pd-stars">{% for i in "12345" %}{% if forloop.counter <= average_rating|floatformat:0 %}★{% else %}☆{% endif %}{% endfor %}</span>
+                <span class="pd-rating-value">{{ average_rating }}</span>
+                <a href="#reviews" class="pd-review-count">({{ review_count }} review{{ review_count|pluralize }})</a>
+            </div>
+
+            <div class="pd-price-row">
+                <span class="pd-price-current">${{ product.price }}</span>
+                {% if product.discount_percent %}
+                    <span class="pd-price-original">${{ product.discount_price }}</span>
+                    <span class="pd-off-pill">Save {{ product.discount_percent }}%</span>
+                {% endif %}
+            </div>
+
+            {% if product.stock > 0 %}
+                <span class="stock-pill in-stock"><i class="fas fa-check-circle"></i> In stock ({{ product.stock }} available)</span>
+            {% else %}
+                <span class="stock-pill out-stock"><i class="fas fa-times-circle"></i> Out of stock</span>
+            {% endif %}
+
+            <form method="post" action="{% url 'cart_and_orders:add_to_cart' product.pk %}" id="pdActionForm">
+                {% csrf_token %}
+
+                {% if variants %}
+                <span class="pd-section-label">Options</span>
+                <div class="pd-variants">
+                    {% for variant in variants %}
+                    <label class="variant-pill">
+                        <input type="radio" name="variant" value="{{ variant.id }}" {% if forloop.first %}checked{% endif %}>
+                        <span>{{ variant.name }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <span class="pd-section-label">Quantity</span>
+                <div class="pd-qty-row">
+                    <div class="qty-control">
+                        <button type="button" class="qty-btn" id="qtyDec">−</button>
+                        <input type="number" id="qty-input" name="quantity" value="1" min="1" max="{{ product.stock }}">
+                        <button type="button" class="qty-btn" id="qtyInc">+</button>
+                    </div>
+                </div>
+
+                <div class="pd-actions">
+                    <button type="submit" name="next" value="cart" class="btn btn-soft" {% if product.stock <= 0 %}disabled{% endif %}>
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                    <button type="submit" name="next" value="checkout" class="btn btn-primary" {% if product.stock <= 0 %}disabled{% endif %}>
+                        <i class="fas fa-bolt"></i> Buy Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="pd-block">
+        <h2>Description</h2>
+        <p>{{ product.description }}</p>
+    </div>
+
+    {% if specifications %}
+    <div class="pd-block">
+        <h2>Specifications</h2>
+        <table class="pd-specs">
+            {% for spec in specifications %}
+            <tr><td>{{ spec.key }}</td><td>{{ spec.value }}</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="pd-block" id="reviews">
+        <div class="pd-reviews-head">
+            <h2 style="margin-bottom:0;">Customer Reviews</h2>
+            {% if user.is_authenticated %}
+                {% if user_has_reviewed %}
+                    <span class="pd-reviewed-pill"><i class="fas fa-check"></i> You reviewed this</span>
+                {% else %}
+                    <a class="btn btn-soft" style="flex:none; padding:9px 16px;" href="{% url 'reviews:add_review' product.id %}"><i class="fas fa-pen"></i> Write a Review</a>
+                {% endif %}
+            {% else %}
+                {# point this at your actual login url name #}
+                <a class="btn btn-soft" style="flex:none; padding:9px 16px;" href="{% url 'login' %}?next={{ request.path }}">Log in to review</a>
+            {% endif %}
+        </div>
+
+        {% for review in reviews %}
+        <div class="pd-review-item">
+            <div class="pd-review-stars">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+            <div class="pd-review-meta">{{ review.user.username }} &middot; {{ review.created_at|date:'M d, Y' }}</div>
+            <p>{{ review.comment }}</p>
+            {% if review.review_images %}<img class="pd-review-img" src="{{ review.review_images.url }}" alt="review photo">{% endif %}
+        </div>
+        {% empty %}
+        <p style="color:var(--text-muted); font-size:14px;">No reviews yet — be the first to review this product.</p>
+        {% endfor %}
+    </div>
+
+    {% if related_products %}
+    <div class="pd-related">
+        <h2>You might also like</h2>
+        <div class="pd-related-grid">
+            {% for rp in related_products %}
+            <a class="pd-rel-card" href="{% url 'product_management:product_detail' rp.slug %}">
+                <div class="pd-rel-img">
+                    {% if rp.images.first %}
+                        <img src="{{ rp.images.first.image.url }}" alt="{{ rp.name }}">
+                    {% else %}
+                        <i class="fas fa-box-open"></i>
+                    {% endif %}
+                </div>
+                <div class="pd-rel-body">
+                    <h4>{{ rp.name }}</h4>
+                    <div class="price">${{ rp.price }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    // thumbnail swap
+    document.querySelectorAll('.pd-thumb').forEach(thumb => {
+        thumb.addEventListener('click', () => {
+            document.querySelectorAll('.pd-thumb').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+            const mainImg = document.getElementById('pdMainImage');
+            if (mainImg) mainImg.src = thumb.dataset.src;
+        });
+    });
+
+    // quantity stepper
+    const qtyInput = document.getElementById('qty-input');
+    const max = parseInt(qtyInput?.max || '999', 10) || 999;
+    document.getElementById('qtyInc')?.addEventListener('click', () => {
+        const val = parseInt(qtyInput.value || '1', 10);
+        if (val < max) qtyInput.value = val + 1;
+    });
+    document.getElementById('qtyDec')?.addEventListener('click', () => {
+        const val = parseInt(qtyInput.value || '1', 10);
+        if (val > 1) qtyInput.value = val - 1;
+    });
+})();
+</script>
+{% endblock %}

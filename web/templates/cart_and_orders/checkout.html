@@ -2,46 +2,71 @@
 {% block title %}Checkout | Buy2Express{% endblock %}
 {% block content %}
 <style>
-    .shell { max-width: 900px; margin: 0 auto; padding: 32px 20px 0; }
-    .panel { background: white; border-radius: 20px; box-shadow: 0 10px 28px rgba(0,0,0,0.08); overflow: hidden; }
-    .header { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; padding: 28px 32px; }
-    .body { padding: 32px; }
-    .field { margin-bottom: 18px; }
-    label { display:block; margin-bottom: 8px; font-weight: 700; }
-    input, textarea { width: 100%; padding: 13px 14px; border: 1px solid #e8e8e8; border-radius: 12px; }
-    textarea { min-height: 120px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; padding: 12px 16px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; }
-    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; }
-    .btn-soft { background: #f3f4f6; color: #222; }
-    .summary { background: #fafafa; padding: 18px; border-radius: 16px; margin-bottom: 20px; }
-    .summary-row { display:flex; justify-content: space-between; margin-bottom: 10px; }
-    .actions { margin-top: 18px; display:flex; gap: 10px; flex-wrap: wrap; }
+    .ck-shell { max-width: 1000px; margin: 0 auto; padding: 32px 24px 70px; }
+    .ck-layout { display: grid; grid-template-columns: 1.3fr 1fr; gap: 26px; align-items: start; }
+    .ck-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-sm); overflow: hidden; }
+    .ck-header { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-soft) 70%); color: white; padding: 26px 30px; }
+    .ck-header h1 { font-size: 22px; font-weight: 800; }
+    .ck-header p { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .ck-body { padding: 28px 30px; }
+    .ck-field { margin-bottom: 18px; }
+    .ck-field label { display: block; font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 7px; }
+    .ck-field textarea, .ck-field input {
+        width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+        background: #fcfbfa; font-size: 14px; font-family: inherit; transition: var(--transition-fast); resize: vertical;
+    }
+    .ck-field textarea { min-height: 110px; }
+    .ck-field textarea:focus, .ck-field input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(245,166,35,0.12); }
+
+    .ck-summary-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-sm); padding: 24px; }
+    .ck-summary-panel h3 { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 14px; }
+    .ck-item-row { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--text-muted); padding: 8px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+    .ck-item-row:last-of-type { border-bottom: none; }
+    .ck-item-row .name { color: var(--text-dark); font-weight: 600; }
+    .ck-total-row { display: flex; justify-content: space-between; font-size: 17px; font-weight: 800; color: var(--text-dark); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .ck-total-row .amount { color: var(--primary); }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; padding: 13px 20px; text-decoration: none; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: var(--transition-fast); }
+    .btn-primary { background: var(--primary); color: var(--secondary); box-shadow: var(--shadow-sm); width: 100%; margin-top: 16px; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-soft { background: var(--bg-card); color: var(--text-dark); border: 1.5px solid var(--border); }
+    .btn-soft:hover { background: #f1efe9; }
+    .ck-actions { display: flex; gap: 10px; margin-top: 6px; }
+
+    @media (max-width: 800px) { .ck-layout { grid-template-columns: 1fr; } }
 </style>
-<div class="shell">
-    <div class="panel">
-        <div class="header">
-            <h1>Checkout</h1>
-        </div>
-        <div class="body">
-            <div class="summary">
-                <div class="summary-row"><span>Cart items</span><span>{{ cart_items|length }}</span></div>
-                <div class="summary-row"><span>Estimated total</span><span>${{ cart.get_total_price }}</span></div>
+<div class="ck-shell">
+    <div class="ck-layout">
+        <div class="ck-panel">
+            <div class="ck-header"><h1><i class="fas fa-truck"></i> Checkout</h1><p>Tell us where to ship your order.</p></div>
+            <div class="ck-body">
+                <form method="post" id="checkoutForm">
+                    {% csrf_token %}
+                    <div class="ck-field">
+                        <label for="id_shipping_address">Shipping address</label>
+                        {{ form.shipping_address }}
+                    </div>
+                    <div class="ck-field">
+                        <label for="id_billing_address">Billing address</label>
+                        {{ form.billing_address }}
+                    </div>
+                    <div class="ck-actions">
+                        <a class="btn btn-soft" href="{% url 'cart_and_orders:cart_view' %}">Back to cart</a>
+                    </div>
+                </form>
             </div>
-            <form method="post">
-                {% csrf_token %}
-                <div class="field">
-                    <label for="id_shipping_address">Shipping address</label>
-                    {{ form.shipping_address }}
-                </div>
-                <div class="field">
-                    <label for="id_billing_address">Billing address</label>
-                    {{ form.billing_address }}
-                </div>
-                <div class="actions">
-                    <button class="btn btn-primary" type="submit">Place Order</button>
-                    <a class="btn btn-soft" href="{% url 'cart_and_orders:cart_view' %}">Back to cart</a>
-                </div>
-            </form>
+        </div>
+
+        <div class="ck-summary-panel">
+            <h3>Order Summary</h3>
+            {% for item in cart_items %}
+            <div class="ck-item-row">
+                <span class="name">{{ item.product.name }} &times; {{ item.quantity }}</span>
+                <span>${{ item.product.price|floatformat:2 }}</span>
+            </div>
+            {% endfor %}
+            <div class="ck-total-row"><span>Total</span><span class="amount">${{ cart.get_total_price }}</span></div>
+            <button class="btn btn-primary" type="submit" form="checkoutForm"><i class="fas fa-lock"></i> Place Order &amp; Pay</button>
         </div>
     </div>
 </div>

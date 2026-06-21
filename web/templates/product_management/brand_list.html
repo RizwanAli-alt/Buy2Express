@@ -1,33 +1,167 @@
 {% extends 'base.html' %}
 {% block title %}Brands | Buy2Express{% endblock %}
-{% block content %}
+
+{% block extra_css %}
 <style>
-    .shell { max-width: 1100px; margin: 0 auto; padding: 32px 20px 0; }
-    .hero { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; border-radius: 24px; padding: 32px; margin-bottom: 24px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
-    .card { background: white; border-radius: 18px; padding: 22px; box-shadow: 0 10px 28px rgba(0,0,0,0.08); }
-    .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; padding: 11px 14px; text-decoration: none; font-weight: 700; }
-    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; }
-    .btn-soft { background: #f3f4f6; color: #222; }
+    .brands-shell { max-width: 1200px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    /* Hero banner — matches header/footer dark gradient + shimmer accent */
+    .page-hero {
+        position: relative;
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-soft) 55%, #2D3166 100%);
+        border-radius: 20px;
+        padding: 44px 40px;
+        color: #fff;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        animation: pageIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+        margin-bottom: 32px;
+    }
+    .page-hero::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+        background-size: 200%;
+        animation: shimmerBar 3s linear infinite;
+    }
+    .page-hero::after {
+        content: '\f02b';
+        font-family: 'Font Awesome 5 Free'; font-weight: 900;
+        position: absolute; right: -10px; bottom: -30px;
+        font-size: 160px; color: rgba(255,255,255,0.05);
+    }
+    .hero-eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(245,166,35,0.15); color: var(--primary-light);
+        padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+        letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 14px;
+    }
+    .page-hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+    .page-hero p { color: rgba(255,255,255,0.65); font-size: 15px; max-width: 460px; }
+    .hero-stats { display: flex; gap: 28px; margin-top: 22px; }
+    .hero-stat strong { display: block; font-size: 24px; font-weight: 800; color: var(--primary-light); }
+    .hero-stat span { font-size: 12px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Toolbar */
+    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+    .toolbar h2 { font-size: 20px; font-weight: 700; color: var(--text-dark); position: relative; padding-left: 16px; }
+    .toolbar h2::before {
+        content: ''; position: absolute; left: 0; top: 3px; bottom: 3px; width: 4px;
+        background: var(--primary); border-radius: 2px;
+    }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        border-radius: 10px; padding: 12px 20px; text-decoration: none; font-weight: 700;
+        font-size: 14px; border: none; cursor: pointer; transition: var(--transition-fast); }
+    .btn-primary { background: var(--primary); color: var(--secondary); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-primary:active { transform: translateY(0) scale(0.98); }
+
+    /* Grid — same DNA as .product-card */
+    .brand-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+
+    .brand-card {
+        background: var(--bg-card); border-radius: 18px; padding: 26px 22px;
+        box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+        position: relative; overflow: hidden; text-align: center;
+        transition: var(--transition); animation: cardReveal 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .brand-card:nth-child(1){animation-delay:.05s;} .brand-card:nth-child(2){animation-delay:.10s;}
+    .brand-card:nth-child(3){animation-delay:.15s;} .brand-card:nth-child(4){animation-delay:.20s;}
+    .brand-card:nth-child(5){animation-delay:.25s;} .brand-card:nth-child(6){animation-delay:.30s;}
+    .brand-card:nth-child(n+7){animation-delay:.35s;}
+
+    .brand-card::after {
+        content: ''; position: absolute; inset: 0; border-radius: 18px; border: 2px solid var(--primary);
+        opacity: 0; transition: opacity .25s ease; pointer-events: none;
+    }
+    .brand-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .brand-card:hover::after { opacity: 1; }
+
+    .brand-avatar {
+        width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 14px;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: var(--secondary); font-size: 24px; font-weight: 800;
+        box-shadow: var(--shadow-sm);
+    }
+    .brand-logo-img {
+        width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 14px;
+        object-fit: cover; border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    }
+    .brand-name { font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .brand-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+
+    .brand-actions { display: flex; gap: 8px; }
+    .btn-chip {
+        flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        border-radius: 8px; padding: 9px 10px; font-size: 12.5px; font-weight: 700;
+        text-decoration: none; transition: var(--transition-fast); border: 1px solid var(--border);
+        color: var(--text-dark); background: var(--bg-page);
+    }
+    .btn-chip:hover { background: #FFF8EC; color: var(--primary-dark); border-color: var(--primary); }
+    .btn-chip.danger:hover { background: #FDEDEC; color: #C0392B; border-color: #E24B4A; }
+
+    .empty-state {
+        grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--bg-card);
+        border-radius: 18px; border: 1px dashed var(--border);
+    }
+    .empty-state i { font-size: 42px; color: var(--border); margin-bottom: 14px; }
+    .empty-state p { color: var(--text-muted); font-size: 14px; }
+
+    @media (max-width: 600px) {
+        .page-hero { padding: 32px 24px; }
+        .page-hero h1 { font-size: 26px; }
+        .hero-stats { gap: 18px; }
+    }
 </style>
-<div class="shell">
-    <div class="hero">
+{% endblock %}
+
+{% block content %}
+<div class="brands-shell">
+    <div class="page-hero">
+        <span class="hero-eyebrow"><i class="fas fa-certificate"></i> Brand Directory</span>
         <h1>Brands</h1>
-        <p>Manage trusted labels in the storefront.</p>
+        <p>Manage the trusted labels customers see across your storefront — add new partners or update existing ones.</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <strong>{{ brands|length }}</strong>
+                <span>Total Brands</span>
+            </div>
+        </div>
     </div>
-    <p><a class="btn btn-primary" href="{% url 'product_management:brand_create' %}">Add Brand</a></p>
-    <div class="grid" style="margin-top: 18px;">
+
+    <div class="toolbar">
+        <h2>All Brands</h2>
+        <a class="btn btn-primary" href="{% url 'product_management:brand_create' %}">
+            <i class="fas fa-plus"></i> Add Brand
+        </a>
+    </div>
+
+    <div class="brand-grid">
         {% for brand in brands %}
-        <div class="card">
-            <h3>{{ brand.name }}</h3>
-            <div class="actions">
-                <a class="btn btn-soft" href="{% url 'product_management:brand_update' brand.pk %}">Edit</a>
-                <a class="btn btn-soft" href="{% url 'product_management:brand_delete' brand.pk %}">Delete</a>
+        <div class="brand-card">
+            {% if brand.logo %}
+                <img class="brand-logo-img" src="{{ brand.logo.url }}" alt="{{ brand.name }}">
+            {% else %}
+                <div class="brand-avatar">{{ brand.name|first|upper }}</div>
+            {% endif %}
+            <h3 class="brand-name">{{ brand.name }}</h3>
+            <p class="brand-meta">Brand Partner</p>
+            <div class="brand-actions">
+                <a class="btn-chip" href="{% url 'product_management:brand_update' brand.pk %}">
+                    <i class="fas fa-pen"></i> Edit
+                </a>
+                <a class="btn-chip danger" href="{% url 'product_management:brand_delete' brand.pk %}">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </a>
             </div>
         </div>
         {% empty %}
-        <div class="card">No brands found.</div>
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <p>No brands found yet. Add your first brand to get started.</p>
+        </div>
         {% endfor %}
     </div>
 </div>

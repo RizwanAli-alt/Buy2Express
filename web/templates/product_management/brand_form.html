@@ -1,26 +1,95 @@
 {% extends 'base.html' %}
-{% block title %}Brand Form | Buy2Express{% endblock %}
-{% block content %}
+{% block title %}{% if form.instance.pk %}Edit Brand{% else %}Add Brand{% endif %} | Buy2Express{% endblock %}
+
+{% block extra_css %}
 <style>
-    .shell { max-width: 860px; margin: 0 auto; padding: 32px 20px 0; }
-    .panel { background: white; border-radius: 24px; box-shadow: 0 14px 35px rgba(0,0,0,0.08); overflow: hidden; }
-    .panel-header { padding: 28px 32px; background: linear-gradient(135deg, #ff4747, #ff7676); color: white; }
-    .panel-body { padding: 32px; }
-    .actions { display:flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; padding: 13px 18px; text-decoration: none; font-weight: 700; cursor: pointer; border:none; }
-    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; }
-    .btn-soft { background: #f3f4f6; color: #222; }
+    .form-shell { max-width: 720px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    .panel {
+        background: var(--bg-card); border-radius: 20px; overflow: hidden;
+        box-shadow: var(--shadow-lg); border: 1px solid var(--border);
+        animation: pageIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .panel-header {
+        position: relative; padding: 30px 36px; color: #fff;
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-soft) 60%, #2D3166 100%);
+        overflow: hidden;
+    }
+    .panel-header::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+        background-size: 200%; animation: shimmerBar 3s linear infinite;
+    }
+    .panel-header-icon {
+        width: 46px; height: 46px; border-radius: 12px; background: rgba(245,166,35,0.15);
+        color: var(--primary-light); display: flex; align-items: center; justify-content: center;
+        font-size: 20px; margin-bottom: 14px;
+    }
+    .panel-header h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 4px; }
+    .panel-header p { color: rgba(255,255,255,0.6); font-size: 14px; }
+
+    .panel-body { padding: 36px; }
+
+    .panel-body form p { margin-bottom: 20px; }
+    .panel-body form label {
+        display: block; font-size: 13px; font-weight: 700; color: var(--text-dark);
+        margin-bottom: 7px; letter-spacing: 0.2px;
+    }
+    .panel-body form input[type="text"],
+    .panel-body form input[type="number"],
+    .panel-body form input[type="email"],
+    .panel-body form input[type="url"],
+    .panel-body form textarea,
+    .panel-body form select {
+        width: 100%; padding: 12px 16px; border-radius: 10px; border: 2px solid var(--border);
+        font-size: 14px; color: var(--text-dark); background: var(--bg-page);
+        transition: var(--transition-fast);
+    }
+    .panel-body form textarea { min-height: 110px; resize: vertical; }
+    .panel-body form input:focus,
+    .panel-body form textarea:focus,
+    .panel-body form select:focus {
+        outline: none; border-color: var(--primary); background: #fff;
+        box-shadow: 0 0 0 4px rgba(245,166,35,0.15);
+    }
+    .panel-body form input[type="file"] {
+        width: 100%; padding: 10px; border: 2px dashed var(--border); border-radius: 10px;
+        background: var(--bg-page); font-size: 13px; cursor: pointer; transition: var(--transition-fast);
+    }
+    .panel-body form input[type="file"]:hover { border-color: var(--primary); background: #FFF8EC; }
+    .panel-body form .helptext { display: block; font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+    .panel-body form ul.errorlist { list-style: none; color: #C0392B; font-size: 12.5px; margin-top: 6px; padding: 0; }
+
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        border-radius: 10px; padding: 13px 22px; text-decoration: none; font-weight: 700;
+        font-size: 14px; border: none; cursor: pointer; transition: var(--transition-fast); }
+    .btn-primary { background: var(--primary); color: var(--secondary); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-soft { background: var(--bg-page); color: var(--text-dark); border: 1px solid var(--border); }
+    .btn-soft:hover { background: #fff; border-color: var(--text-muted); }
 </style>
-<div class="shell">
+{% endblock %}
+
+{% block content %}
+<div class="form-shell">
     <div class="panel">
-        <div class="panel-header"><h1>Brand</h1></div>
+        <div class="panel-header">
+            <div class="panel-header-icon"><i class="fas fa-certificate"></i></div>
+            <h1>{% if form.instance.pk %}Edit Brand{% else %}Add New Brand{% endif %}</h1>
+            <p>Fill in the details below to {% if form.instance.pk %}update this{% else %}create a new{% endif %} brand.</p>
+        </div>
         <div class="panel-body">
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form.as_p }}
                 <div class="actions">
-                    <button class="btn btn-primary" type="submit">Save Brand</button>
-                    <a class="btn btn-soft" href="{% url 'product_management:brand_list' %}">Cancel</a>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-check"></i> Save Brand
+                    </button>
+                    <a class="btn btn-soft" href="{% url 'product_management:brand_list' %}">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
                 </div>
             </form>
         </div>

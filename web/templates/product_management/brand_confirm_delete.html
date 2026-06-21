@@ -1,26 +1,68 @@
 {% extends 'base.html' %}
 {% block title %}Delete Brand | Buy2Express{% endblock %}
-{% block content %}
+
+{% block extra_css %}
 <style>
-    .shell { max-width: 720px; margin: 0 auto; padding: 32px 20px 0; }
-    .panel { background: white; border-radius: 24px; box-shadow: 0 14px 35px rgba(0,0,0,0.08); overflow: hidden; }
-    .panel-header { padding: 28px 32px; background: linear-gradient(135deg, #ff4747, #ff7676); color: white; }
-    .panel-body { padding: 32px; }
-    .actions { display:flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; padding: 13px 18px; text-decoration: none; font-weight: 700; border:none; cursor:pointer; }
-    .btn-danger { background: #d63031; color: white; }
-    .btn-soft { background: #f3f4f6; color: #222; }
+    .form-shell { max-width: 600px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    .panel {
+        background: var(--bg-card); border-radius: 20px; overflow: hidden;
+        box-shadow: var(--shadow-lg); border: 1px solid var(--border);
+        animation: pageIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+        text-align: center;
+    }
+    .panel-header {
+        position: relative; padding: 36px 32px 28px; color: #fff;
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-soft) 60%, #2D3166 100%);
+        overflow: hidden;
+    }
+    .panel-header::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, #E24B4A, var(--primary), #E24B4A);
+        background-size: 200%; animation: shimmerBar 3s linear infinite;
+    }
+    .warn-icon {
+        width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 16px;
+        background: rgba(226,75,74,0.15); color: #E24B4A;
+        display: flex; align-items: center; justify-content: center; font-size: 26px;
+        animation: badgePop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .panel-header h1 { font-size: 22px; font-weight: 800; }
+
+    .panel-body { padding: 34px 32px; }
+    .panel-body p { color: var(--text-muted); font-size: 15px; line-height: 1.6; margin-bottom: 4px; }
+    .panel-body strong { color: var(--text-dark); }
+
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; justify-content: center; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        border-radius: 10px; padding: 13px 22px; text-decoration: none; font-weight: 700;
+        font-size: 14px; border: none; cursor: pointer; transition: var(--transition-fast); flex: 1; min-width: 140px; }
+    .btn-danger { background: #E24B4A; color: #fff; box-shadow: var(--shadow-sm); }
+    .btn-danger:hover { background: #C0392B; transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-soft { background: var(--bg-page); color: var(--text-dark); border: 1px solid var(--border); }
+    .btn-soft:hover { background: #fff; border-color: var(--text-muted); }
 </style>
-<div class="shell">
+{% endblock %}
+
+{% block content %}
+<div class="form-shell">
     <div class="panel">
-        <div class="panel-header"><h1>Delete Brand</h1></div>
+        <div class="panel-header">
+            <div class="warn-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h1>Delete Brand</h1>
+        </div>
         <div class="panel-body">
-            <p>Delete <strong>{{ brand.name }}</strong>?</p>
+            <p>Are you sure you want to delete <strong>{{ brand.name }}</strong>?</p>
+            <p>This action cannot be undone.</p>
             <form method="post">
                 {% csrf_token %}
                 <div class="actions">
-                    <button class="btn btn-danger" type="submit">Yes, delete</button>
-                    <a class="btn btn-soft" href="{% url 'product_management:brand_list' %}">Cancel</a>
+                    <button class="btn btn-danger" type="submit">
+                        <i class="fas fa-trash-alt"></i> Yes, Delete
+                    </button>
+                    <a class="btn btn-soft" href="{% url 'product_management:brand_list' %}">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
                 </div>
             </form>
         </div>

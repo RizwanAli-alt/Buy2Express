@@ -1,43 +1,52 @@
 {% extends 'base.html' %}
-{% block title %}Write Review | Buy2Express{% endblock %}
+{% block title %}Write a Review | Buy2Express{% endblock %}
 {% block content %}
 <style>
-    .shell { max-width: 820px; margin: 0 auto; padding: 32px 20px 0; }
-    .panel { background:white; border-radius:20px; box-shadow:0 10px 28px rgba(0,0,0,0.08); overflow:hidden; }
-    .header { background: linear-gradient(135deg, #ff4747, #ff7676); color:white; padding: 28px 32px; }
-    .body { padding: 32px; }
-    .field { margin-bottom: 18px; }
-    label { display:block; margin-bottom:8px; font-weight:700; }
-    input, textarea, select { width:100%; padding:13px 14px; border:1px solid #e8e8e8; border-radius:12px; }
-    textarea { min-height: 140px; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:12px; padding:12px 16px; text-decoration:none; font-weight:700; border:none; cursor:pointer; }
-    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color:white; }
-    .btn-soft { background:#f3f4f6; color:#222; }
-    .actions { margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
+    .rv-shell { max-width: 720px; margin: 0 auto; padding: 32px 24px 70px; }
+    .rv-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-md); overflow: hidden; }
+    .rv-header { background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-soft) 70%); color: white; padding: 28px 32px; }
+    .rv-header h1 { font-size: 21px; font-weight: 800; }
+    .rv-body { padding: 30px 32px; }
+    .rv-field { margin-bottom: 18px; }
+    .rv-field label { display: block; font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 7px; }
+    .rv-field input, .rv-field textarea {
+        width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+        background: #fcfbfa; font-size: 14px; font-family: inherit; transition: var(--transition-fast); resize: vertical;
+    }
+    .rv-field textarea { min-height: 130px; }
+    .rv-field input:focus, .rv-field textarea:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(245,166,35,0.12); }
+    .rv-field ul.errorlist { list-style: none; color: #C0392B; font-size: 12.5px; margin-top: 6px; padding: 0; }
+
+    .rv-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; padding: 13px 22px; text-decoration: none; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: var(--transition-fast); }
+    .btn-primary { background: var(--primary); color: var(--secondary); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-soft { background: var(--bg-card); color: var(--text-dark); border: 1.5px solid var(--border); }
+    .btn-soft:hover { background: #f1efe9; }
 </style>
-<div class="shell">
-    <div class="panel">
-        <div class="header">
-            <h1>Review {{ product.name }}</h1>
-        </div>
-        <div class="body">
+<div class="rv-shell">
+    <div class="rv-panel">
+        <div class="rv-header"><h1>Review {{ product.name }}</h1></div>
+        <div class="rv-body">
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="field">
-                    <label for="id_rating">Rating</label>
+                <div class="rv-field">
+                    <label for="id_rating">Rating (1&ndash;5)</label>
                     {{ form.rating }}
+                    {{ form.rating.errors }}
                 </div>
-                <div class="field">
+                <div class="rv-field">
                     <label for="id_comment">Comment</label>
                     {{ form.comment }}
+                    {{ form.comment.errors }}
                 </div>
-                <div class="field">
-                    <label for="id_review_images">Review image</label>
+                <div class="rv-field">
+                    <label for="id_review_images">Optional photo</label>
                     {{ form.review_images }}
                 </div>
-                <div class="actions">
+                <div class="rv-actions">
                     <button class="btn btn-primary" type="submit">Submit Review</button>
-                    <a class="btn btn-soft" href="{% url 'reviews:product_detail' product.id %}">Back</a>
+                    <a class="btn btn-soft" href="{% url 'product_management:product_detail' product.slug %}">Back</a>
                 </div>
             </form>
         </div>

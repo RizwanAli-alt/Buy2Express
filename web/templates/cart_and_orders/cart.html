@@ -2,53 +2,86 @@
 {% block title %}Cart | Buy2Express{% endblock %}
 {% block content %}
 <style>
-    .shell { max-width: 1200px; margin: 0 auto; padding: 32px 20px 0; }
-    .hero { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; border-radius: 24px; padding: 32px; margin-bottom: 24px; }
-    .layout { display: grid; grid-template-columns: 2fr 1fr; gap: 22px; }
-    .panel { background: white; border-radius: 20px; box-shadow: 0 10px 28px rgba(0,0,0,0.08); padding: 24px; }
-    .item { display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid #eee; }
-    .item:last-child { border-bottom: none; }
-    .meta { color: #666; font-size: 14px; }
-    .price { font-weight: 700; color: #ff4747; }
-    .actions { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; padding: 12px 16px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; }
-    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color: white; }
-    .btn-soft { background: #f3f4f6; color: #222; }
-    .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-    .empty { color: #666; }
-    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
-</style>
-<div class="shell">
-    <div class="hero">
-        <h1>Your Cart</h1>
-        <p>Review items before checkout.</p>
-    </div>
+    .ca-shell { max-width: 1100px; margin: 0 auto; padding: 32px 24px 70px; }
+    .ca-hero {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-soft) 60%, #2D3166 100%);
+        color: white; border-radius: 20px; padding: 34px 36px; margin-bottom: 24px;
+        box-shadow: var(--shadow-md); border: 1px solid rgba(245,166,35,0.25);
+    }
+    .ca-hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+    .ca-hero p { color: rgba(255,255,255,0.7); font-size: 14px; }
 
-    <div class="layout">
-        <div class="panel">
+    .ca-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 22px; align-items: start; }
+    .ca-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-sm); padding: 22px; }
+
+    .ca-item { display: flex; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .ca-item:last-child { border-bottom: none; }
+    .ca-item-img { width: 70px; height: 70px; border-radius: 12px; background: linear-gradient(135deg,#f5f4f0,#fff); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+    .ca-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .ca-item-img i { color: var(--border); font-size: 22px; }
+    .ca-item-info { flex: 1; min-width: 0; }
+    .ca-item-info h3 { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .ca-item-meta { font-size: 12.5px; color: var(--text-muted); }
+    .ca-item-price { font-weight: 700; color: var(--primary); font-size: 15px; white-space: nowrap; }
+    .ca-remove-form { margin: 0; }
+    .ca-remove-btn { background: none; border: none; color: #C0392B; cursor: pointer; font-size: 14px; padding: 8px; border-radius: 8px; transition: var(--transition-fast); }
+    .ca-remove-btn:hover { background: #FDEDEC; }
+
+    .ca-empty { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+    .ca-empty i { font-size: 38px; color: var(--border); margin-bottom: 12px; display: block; }
+
+    .ca-summary h3 { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 16px; }
+    .ca-summary-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); margin-bottom: 10px; }
+    .ca-summary-row.total { font-size: 18px; font-weight: 800; color: var(--text-dark); border-top: 1px solid var(--border); padding-top: 14px; margin-top: 8px; }
+    .ca-summary-row.total .amount { color: var(--primary); }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; padding: 13px 18px; text-decoration: none; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: var(--transition-fast); width: 100%; }
+    .btn-primary { background: var(--primary); color: var(--secondary); box-shadow: var(--shadow-sm); margin-bottom: 10px; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-soft { background: var(--bg-card); color: var(--text-dark); border: 1.5px solid var(--border); }
+    .btn-soft:hover { background: #f1efe9; }
+
+    @media (max-width: 860px) { .ca-layout { grid-template-columns: 1fr; } }
+</style>
+<div class="ca-shell">
+    <div class="ca-hero"><h1>Your Cart</h1><p>Review items before checkout.</p></div>
+
+    <div class="ca-layout">
+        <div class="ca-panel">
             {% if cart_items %}
                 {% for item in cart_items %}
-                <div class="item">
-                    <div>
-                        <h3>{{ item.product.name }}</h3>
-                        <div class="meta">Qty: {{ item.quantity }}{% if item.variant %} · Variant: {{ item.variant.name }}{% endif %}</div>
+                <div class="ca-item">
+                    <div class="ca-item-img">
+                        {% if item.product.images.first %}
+                            <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                            <i class="fas fa-box-open"></i>
+                        {% endif %}
                     </div>
-                    <div class="price">${{ item.product.price }}</div>
+                    <div class="ca-item-info">
+                        <h3>{{ item.product.name }}</h3>
+                        <div class="ca-item-meta">Qty: {{ item.quantity }}{% if item.variant %} &middot; {{ item.variant.name }}{% endif %}</div>
+                    </div>
+                    <div class="ca-item-price">${{ item.product.price }}</div>
+                    <form class="ca-remove-form" method="post" action="{% url 'cart_and_orders:remove_from_cart' item.id %}">
+                        {% csrf_token %}
+                        <button class="ca-remove-btn" type="submit" title="Remove"><i class="fas fa-trash"></i></button>
+                    </form>
                 </div>
                 {% endfor %}
             {% else %}
-                <p class="empty">Your cart is empty.</p>
+                <div class="ca-empty"><i class="fas fa-shopping-cart"></i><p>Your cart is empty.</p></div>
             {% endif %}
         </div>
 
-        <div class="panel">
+        <div class="ca-panel ca-summary">
             <h3>Summary</h3>
-            <div class="summary-row"><span>Items</span><span>{{ cart_items|length }}</span></div>
-            <div class="summary-row"><span>Created</span><span>{{ cart.created_at|date:'M d, Y' }}</span></div>
-            <div class="actions">
-                <a class="btn btn-primary" href="{% url 'cart_and_orders:checkout' %}">Checkout</a>
-                <a class="btn btn-soft" href="{% url 'product_management:products' %}">Continue shopping</a>
-            </div>
+            <div class="ca-summary-row"><span>Items</span><span>{{ cart_items|length }}</span></div>
+            <div class="ca-summary-row total"><span>Total</span><span class="amount">${{ cart.get_total_price }}</span></div>
+            {% if cart_items %}
+            <a class="btn btn-primary" href="{% url 'cart_and_orders:checkout' %}">Checkout</a>
+            {% endif %}
+            <a class="btn btn-soft" href="{% url 'product_management:products' %}">Continue shopping</a>
         </div>
     </div>
 </div>

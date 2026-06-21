@@ -10,7 +10,6 @@
         *, *::before, *::after {
             margin: 0; padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
         }
 
         :root {
@@ -433,7 +432,7 @@
     </style>
 </head>
 <body>
-
+       
 <div class="card">
     <div class="card-header">
         <a href="{% url 'home' %}" class="logo">
@@ -480,9 +479,10 @@
                 <div class="sidebar">
                     <div class="avatar-wrap">
                         <div class="avatar-circle" id="avatarCircle">
-                            <i class="fas fa-user" id="avatarIcon"></i>
-                            <img id="avatarImg" alt="Profile photo" style="display:none;">
-                        </div>
+    <i class="fas fa-user" id="avatarIcon" {% if user.profile_image %}style="display:none;"{% endif %}></i>
+    <img id="avatarImg" alt="Profile photo"
+         {% if user.profile_image %}src="{{ user.profile_image.url }}" style="display:block;"{% else %}style="display:none;"{% endif %}>
+</div>
                         <label for="id_profile_image" class="avatar-edit" title="Change photo">
                             <i class="fas fa-camera"></i>
                         </label>

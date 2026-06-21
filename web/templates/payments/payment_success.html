@@ -2,21 +2,22 @@
 {% block title %}Payment Success | Buy2Express{% endblock %}
 {% block content %}
 <style>
-    .shell { max-width: 760px; margin: 0 auto; padding: 32px 20px 0; }
-    .panel { background:white; border-radius:20px; box-shadow:0 10px 28px rgba(0,0,0,0.08); overflow:hidden; text-align:center; }
-    .header { background: linear-gradient(135deg, #ff4747, #ff7676); color:white; padding: 28px 32px; }
-    .body { padding: 32px; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; border-radius:12px; padding:12px 16px; text-decoration:none; font-weight:700; border:none; cursor:pointer; }
-    .btn-primary { background: linear-gradient(135deg, #ff4747, #ff7676); color:white; }
+    .ps-shell { max-width: 600px; margin: 60px auto 80px; padding: 0 24px; text-align: center; }
+    .ps-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow-md); overflow: hidden; }
+    .ps-icon { width: 64px; height: 64px; margin: 36px auto 12px; border-radius: 50%; background: #E8F8EE; color: #1E8E4F; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .ps-panel h1 { font-size: 21px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+    .ps-panel p { color: var(--text-muted); font-size: 14px; padding: 0 30px; }
+    .ps-body { padding: 8px 30px 32px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 12px 20px; text-decoration: none; font-weight: 700; font-size: 14px; background: var(--primary); color: var(--secondary); margin-top: 16px; }
+    .btn:hover { background: var(--primary-dark); }
 </style>
-<div class="shell">
-    <div class="panel">
-        <div class="header">
-            <h1>Payment complete</h1>
-        </div>
-        <div class="body">
-            <p>Your payment has been processed successfully.</p>
-            <p style="margin-top:18px;"><a class="btn btn-primary" href="{% url 'cart_and_orders:orders' %}">View orders</a></p>
+<div class="ps-shell">
+    <div class="ps-panel">
+        <div class="ps-icon"><i class="fas fa-check"></i></div>
+        <h1>Payment complete</h1>
+        <div class="ps-body">
+            <p>Your payment has been processed and your order is on its way to being fulfilled.</p>
+            <a class="btn" href="{% url 'cart_and_orders:orders' %}">View orders</a>
         </div>
     </div>
 </div>

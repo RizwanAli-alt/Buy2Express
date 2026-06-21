@@ -10,7 +10,6 @@
         *, *::before, *::after {
             margin: 0; padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
         }
 
         :root {
@@ -35,6 +34,7 @@
         html { scroll-behavior: smooth; }
 
         body {
+            font-family: 'Segoe UI', Arial, sans-serif;
             min-height: 100vh;
             background: var(--bg-page);
             display: flex;
@@ -43,6 +43,18 @@
             padding: 24px;
             position: relative;
             overflow-x: hidden;
+        }
+
+        /* Font Awesome fix: pin icon classes so they don't inherit Segoe UI */
+        .fa, .fas, .far, .fal, .fad, .fab,
+        .fa-solid, .fa-regular, .fa-light, .fa-duotone, .fa-brands {
+            font-family: "Font Awesome 6 Free" !important;
+            font-weight: 900;
+        }
+        .far, .fa-regular { font-weight: 400; }
+        .fab, .fa-brands {
+            font-family: "Font Awesome 6 Brands" !important;
+            font-weight: 400;
         }
 
         body::before, body::after {
