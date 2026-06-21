@@ -2,29 +2,109 @@
 {% block title %}Favorite Stores | Buy2Express{% endblock %}
 {% block content %}
 <style>
-    .shell { max-width: 1100px; margin: 0 auto; padding: 32px 20px 0; }
-    .hero { background: linear-gradient(135deg, #ff4747, #ff7676); color:white; border-radius:24px; padding:32px; margin-bottom:24px; }
-    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
-    .card { background:white; border-radius:18px; padding:22px; box-shadow:0 10px 28px rgba(0,0,0,0.08); }
-    .meta { color:#666; font-size:14px; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:12px; padding:12px 16px; text-decoration:none; font-weight:700; border:none; cursor:pointer; }
-    .btn-soft { background:#f3f4f6; color:#222; }
+    .fs-shell { max-width: 1100px; margin: 0 auto; padding: 32px 24px 70px; }
+    .fs-hero {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-soft) 60%, #2D3166 100%);
+        color: white; border-radius: 20px; padding: 30px 32px; margin-bottom: 24px;
+        box-shadow: var(--shadow-md); border: 1px solid rgba(245,166,35,0.25);
+        display: flex; gap: 18px; align-items: center; position: relative; overflow: hidden;
+    }
+    .fs-hero::before {
+        content: ''; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px;
+        border-radius: 50%; background: radial-gradient(circle, rgba(245,166,35,0.18) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .fs-hero-icon {
+        width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+        background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3);
+        display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary);
+        position: relative; z-index: 1; animation: storeBounce 2.6s ease-in-out infinite;
+    }
+    @keyframes storeBounce { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-4px) rotate(-4deg); } }
+    .fs-hero h1 { font-size: 21px; font-weight: 800; margin-bottom: 4px; position: relative; z-index: 1; }
+    .fs-hero p { color: rgba(255,255,255,0.65); font-size: 13.5px; position: relative; z-index: 1; }
+
+    .fs-count { font-size: 13.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 18px; }
+    .fs-count span { color: var(--primary-dark); font-weight: 800; }
+
+    .fs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+
+    .fs-card {
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 22px;
+        box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 14px;
+        transition: var(--transition); opacity: 0; transform: translateY(16px);
+        animation: cardIn 0.5s cubic-bezier(0.34,1.2,0.64,1) forwards; position: relative; overflow: hidden;
+    }
+    .fs-card:nth-child(1) { animation-delay: 0.03s; }
+    .fs-card:nth-child(2) { animation-delay: 0.08s; }
+    .fs-card:nth-child(3) { animation-delay: 0.13s; }
+    .fs-card:nth-child(4) { animation-delay: 0.18s; }
+    .fs-card:nth-child(5) { animation-delay: 0.23s; }
+    .fs-card:nth-child(6) { animation-delay: 0.28s; }
+    @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+
+    .fs-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--primary-light); }
+    .fs-card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        transform: scaleX(0); transform-origin: left; transition: transform 0.35s ease;
+    }
+    .fs-card:hover::before { transform: scaleX(1); }
+
+    .fs-avatar {
+        width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+        background: linear-gradient(135deg, var(--secondary), var(--secondary-soft));
+        display: flex; align-items: center; justify-content: center;
+        color: var(--primary); font-size: 18px; font-weight: 800; text-transform: uppercase;
+    }
+
+    .fs-info h3 { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .fs-meta { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 12.5px; }
+    .fs-meta i { color: var(--primary); font-size: 11px; }
+
+    .fs-empty {
+        background: var(--bg-card); border: 1px dashed var(--border); border-radius: 18px;
+        padding: 60px 20px; text-align: center; color: var(--text-muted); grid-column: 1 / -1;
+    }
+    .fs-empty i { font-size: 42px; color: var(--border); margin-bottom: 14px; display: block; animation: floatStore 3s ease-in-out infinite; }
+    @keyframes floatStore { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .fs-empty p { font-size: 14px; margin-bottom: 18px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 12px 18px; text-decoration: none; font-weight: 700; font-size: 13.5px; border: none; cursor: pointer; transition: var(--transition-fast); }
+    .btn-primary { background: var(--primary); color: var(--secondary); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-soft { background: var(--bg-card); color: var(--text-dark); border: 1.5px solid var(--border); }
+    .btn-soft:hover { background: #f1efe9; }
 </style>
-<div class="shell">
-    <div class="hero">
-        <h1>Favorite Stores</h1>
-        <p>Track sellers you trust most.</p>
+
+<div class="fs-shell">
+    <div class="fs-hero">
+        <div class="fs-hero-icon"><i class="fas fa-store"></i></div>
+        <div>
+            <h1>Favorite Stores</h1>
+            <p>Track sellers you trust most.</p>
+        </div>
     </div>
-    <div class="grid">
+
+    <div class="fs-count">You're following <span>{{ favorite_stores|length }}</span> store{{ favorite_stores|length|pluralize }}</div>
+
+    <div class="fs-grid">
         {% for store in favorite_stores %}
-        <div class="card">
-            <h3>{{ store.seller.username }}</h3>
-            <p class="meta">Added {{ store.added_at|date:'M d, Y' }}</p>
+        <div class="fs-card">
+            <div class="fs-avatar">{{ store.seller.username|slice:":1" }}</div>
+            <div class="fs-info">
+                <h3>{{ store.seller.username }}</h3>
+                <div class="fs-meta"><i class="fas fa-circle"></i> Added {{ store.added_at|date:'M d, Y' }}</div>
+            </div>
         </div>
         {% empty %}
-        <div class="card">No favorite stores yet.</div>
+        <div class="fs-empty">
+            <i class="fas fa-store-slash"></i>
+            <p>No favorite stores yet.</p>
+        </div>
         {% endfor %}
     </div>
-    <p style="margin-top:18px;"><a class="btn btn-soft" href="{% url 'home' %}">Back home</a></p>
+
+    <p style="margin-top: 20px;"><a class="btn btn-soft" href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Back home</a></p>
 </div>
 {% endblock %}

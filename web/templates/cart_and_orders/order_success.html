@@ -2,22 +2,51 @@
 {% block title %}Order Placed | Buy2Express{% endblock %}
 {% block content %}
 <style>
-    .os-shell { max-width: 600px; margin: 60px auto 80px; padding: 0 24px; text-align: center; }
-    .os-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow-md); overflow: hidden; }
-    .os-icon { width: 64px; height: 64px; margin: 36px auto 12px; border-radius: 50%; background: #E8F8EE; color: #1E8E4F; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-    .os-panel h1 { font-size: 21px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
-    .os-panel p { color: var(--text-muted); font-size: 14px; padding: 0 30px; }
-    .os-body { padding: 8px 30px 32px; }
-    .btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 12px 20px; text-decoration: none; font-weight: 700; font-size: 14px; background: var(--primary); color: var(--secondary); margin-top: 16px; }
-    .btn:hover { background: var(--primary-dark); }
+    .os-shell { max-width: 640px; margin: 0 auto; padding: 32px 24px 70px; }
+    .os-hero {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-soft) 60%, #2D3166 100%);
+        color: white; border-radius: 20px; padding: 30px 32px; margin-bottom: 24px;
+        box-shadow: var(--shadow-md); border: 1px solid rgba(245,166,35,0.25);
+        display: flex; gap: 18px; align-items: center;
+    }
+    .os-hero-icon {
+        width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+        background: rgba(46,204,113,0.18); border: 1px solid rgba(46,204,113,0.35);
+        display: flex; align-items: center; justify-content: center; font-size: 22px; color: #2ECC71;
+    }
+    .os-hero h1 { font-size: 21px; font-weight: 800; margin-bottom: 4px; }
+    .os-hero p { color: rgba(255,255,255,0.65); font-size: 13.5px; }
+
+    .os-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-sm); padding: 44px 32px; text-align: center; }
+    .os-check { width: 76px; height: 76px; margin: 0 auto 20px; border-radius: 50%; background: #E8F8EE; color: #1E8E4F; display: flex; align-items: center; justify-content: center; font-size: 32px; animation: checkPop 0.5s cubic-bezier(0.34,1.2,0.64,1) both; }
+    @keyframes checkPop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+    .os-panel h2 { font-size: 19px; font-weight: 800; color: var(--text-dark); margin-bottom: 10px; }
+    .os-panel p { color: var(--text-muted); font-size: 14px; max-width: 360px; margin: 0 auto 24px; }
+
+    .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 13px 20px; text-decoration: none; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: var(--transition-fast); }
+    .btn-primary { background: var(--primary); color: var(--secondary); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn-soft { background: var(--bg-card); color: var(--text-dark); border: 1.5px solid var(--border); }
+    .btn-soft:hover { background: #f1efe9; }
 </style>
+
 <div class="os-shell">
+    <div class="os-hero">
+        <div class="os-hero-icon"><i class="fas fa-check"></i></div>
+        <div>
+            <h1>Order Placed</h1>
+            <p>Thanks for shopping with Buy2Express.</p>
+        </div>
+    </div>
+
     <div class="os-panel">
-        <div class="os-icon"><i class="fas fa-check"></i></div>
-        <h1>Order placed successfully</h1>
-        <div class="os-body">
-            <p>Your order has been created and the cart has been cleared.</p>
-            <a class="btn" href="{% url 'cart_and_orders:orders' %}">View orders</a>
+        <div class="os-check"><i class="fas fa-check"></i></div>
+        <h2>Order placed successfully</h2>
+        <p>Your order has been created and the cart has been cleared. We'll notify you once it ships.</p>
+        <div class="actions">
+            <a class="btn btn-primary" href="{% url 'cart_and_orders:orders' %}"><i class="fas fa-receipt"></i> View orders</a>
+            <a class="btn btn-soft" href="{% url 'product_management:products' %}"><i class="fas fa-arrow-left"></i> Continue shopping</a>
         </div>
     </div>
 </div>
