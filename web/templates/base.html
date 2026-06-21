@@ -25,10 +25,11 @@
             </a>
 
             <!-- Search -->
-            <div class="search-bar" role="search">
+            <form class="search-bar" role="search" action="{% url 'search_and_recommendations:search_view' %}" method="get" id="site-search-form">
                 <input
                     type="text"
                     id="site-search"
+                    name="q"
                     placeholder="Search for products, brands and more..."
                     autocomplete="off"
                     aria-label="Search products"
@@ -36,45 +37,25 @@
                     aria-controls="search-suggestions"
                     aria-expanded="false"
                 >
-                <button type="button" aria-label="Submit search">
+                <button type="submit" aria-label="Submit search">
                     <i class="fas fa-search" aria-hidden="true"></i>
                 </button>
 
-<!-- ============================================================
-     REPLACE the existing <div class="search-bar" ...> ... </div>
-     block in base.html with this one.
-     ============================================================ -->
-<form class="search-bar" role="search" action="{% url 'search_and_recommendations:search_view' %}" method="get" id="site-search-form">
-    <input
-        type="text"
-        id="site-search"
-        name="q"
-        placeholder="Search for products, brands and more..."
-        autocomplete="off"
-        aria-label="Search products"
-        aria-haspopup="listbox"
-        aria-controls="search-suggestions"
-        aria-expanded="false"
-    >
-    <button type="submit" aria-label="Submit search">
-        <i class="fas fa-search" aria-hidden="true"></i>
-    </button>
-
-    <!-- Search Suggestions Dropdown (now populated live via JS) -->
-    <div class="search-suggestions" id="search-suggestions" role="listbox" aria-label="Search suggestions">
-        <div class="suggestions-section" id="suggestions-results" style="display:none;">
-            <h3>Suggestions</h3>
-            <div id="suggestions-results-list"></div>
-        </div>
-        <div class="suggestions-section" id="suggestions-empty">
-            <h3>Start typing</h3>
-            <div class="suggestion-item" style="cursor:default;">
-                <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
-                <span>Search for products, brands or categories</span>
-            </div>
-        </div>
-    </div>
-</form>
+                <!-- Search Suggestions Dropdown (populated live via JS) -->
+                <div class="search-suggestions" id="search-suggestions" role="listbox" aria-label="Search suggestions">
+                    <div class="suggestions-section" id="suggestions-results" style="display:none;">
+                        <h3>Suggestions</h3>
+                        <div id="suggestions-results-list"></div>
+                    </div>
+                    <div class="suggestions-section" id="suggestions-empty">
+                        <h3>Start typing</h3>
+                        <div class="suggestion-item" style="cursor:default;">
+                            <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                            <span>Search for products, brands or categories</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
 
             <!-- User Nav -->
             <nav class="user-nav" aria-label="User navigation">

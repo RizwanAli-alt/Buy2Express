@@ -69,11 +69,16 @@ def search_view(request):
         response = search[:50].execute()
         total    = response.hits.total.value
 
+        # bulk-fetch slugs in one query to avoid N+1 lookups
+        hit_ids  = [hit.id for hit in response]
+        slug_map = dict(Product.objects.filter(pk__in=hit_ids).values_list('id', 'slug'))
+
         results = [{
             'id':          hit.id,
             'name':        hit.name,
             'description': hit.description,
             'price':       hit.price,
+            'slug':        slug_map.get(int(hit.id), ''),
             'category':    hit.category.name if hasattr(hit, 'category') else '',
             'brand':       hit.brand.name    if hasattr(hit, 'brand')    else '',
             'score':       hit.meta.score,
